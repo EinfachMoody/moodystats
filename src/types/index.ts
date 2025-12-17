@@ -4,6 +4,8 @@ export type TaskCategory = 'work' | 'personal' | 'health' | 'other';
 
 export type TaskPriority = 'high' | 'medium' | 'low';
 
+export type RepeatType = 'none' | 'daily' | 'weekly' | 'monthly';
+
 export interface Task {
   id: string;
   title: string;
@@ -11,10 +13,19 @@ export interface Task {
   category: TaskCategory;
   priority: TaskPriority;
   dueDate: Date;
+  dueTime?: string;
+  repeat: RepeatType;
   completed: boolean;
   completedAt?: Date;
   points: number;
 }
+
+export const REPEAT_LABELS: Record<RepeatType, string> = {
+  none: 'Never',
+  daily: 'Daily',
+  weekly: 'Weekly',
+  monthly: 'Monthly',
+};
 
 export interface MoodEntry {
   id: string;
