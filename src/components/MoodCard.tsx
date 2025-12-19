@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
 import { MoodEntry, MOOD_EMOJIS, MOOD_LABELS } from '@/types';
 import { format } from 'date-fns';
+import { enUS, Locale } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 interface MoodCardProps {
   entry: MoodEntry;
   index?: number;
+  locale?: Locale;
 }
 
 const moodGradients: Record<MoodEntry['mood'], string> = {
@@ -16,7 +18,7 @@ const moodGradients: Record<MoodEntry['mood'], string> = {
   terrible: 'mood-terrible',
 };
 
-export const MoodCard = ({ entry, index = 0 }: MoodCardProps) => {
+export const MoodCard = ({ entry, index = 0, locale = enUS }: MoodCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -42,7 +44,7 @@ export const MoodCard = ({ entry, index = 0 }: MoodCardProps) => {
             {MOOD_LABELS[entry.mood]}
           </p>
           <p className="text-xs text-foreground/60">
-            {format(entry.date, 'EEEE, MMM d')}
+            {format(new Date(entry.date), 'EEEE, MMM d', { locale })}
           </p>
         </div>
       </div>
