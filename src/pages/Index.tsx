@@ -7,9 +7,11 @@ import {
   Sparkles,
   TrendingUp,
   Calendar,
-  Filter
+  Filter,
+  Search
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { de, enUS, fr, es, tr, ar } from 'date-fns/locale';
 import { Navigation } from '@/components/Navigation';
 import { GlassCard } from '@/components/GlassCard';
 import { TaskCard } from '@/components/TaskCard';
@@ -20,29 +22,48 @@ import { AddTaskDialog } from '@/components/AddTaskDialog';
 import { PointsAnimation } from '@/components/PointsAnimation';
 import { FloatingActionButton } from '@/components/FloatingActionButton';
 import { SettingsPage } from '@/components/SettingsPage';
+import { CalendarView } from '@/components/CalendarView';
 import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS } from '@/types';
+import { Language } from '@/i18n/translations';
+import { useTranslation } from '@/hooks/useTranslation';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { cn } from '@/lib/utils';
+
+const dateLocales = { de, en: enUS, fr, es, tr, ar };
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [moods, setMoods] = useState<MoodEntry[]>([]);
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  
+  // Persistent state with localStorage
+  const [tasks, setTasks] = useLocalStorage<Task[]>('dailyflow-tasks', []);
+  const [moods, setMoods] = useLocalStorage<MoodEntry[]>('dailyflow-moods', []);
+  const [journalEntries, setJournalEntries] = useLocalStorage<JournalEntry[]>('dailyflow-journal', []);
+  const [totalPoints, setTotalPoints] = useLocalStorage<number>('dailyflow-points', 0);
+  const [streak, setStreak] = useLocalStorage<number>('dailyflow-streak', 0);
+  
+  // Settings with localStorage
+  const [language, setLanguage] = useLocalStorage<Language>('dailyflow-language', 'en');
+  const [themeMode, setThemeMode] = useLocalStorage<'light' | 'dark' | 'system'>('dailyflow-themeMode', 'system');
+  const [notifications, setNotifications] = useLocalStorage<boolean>('dailyflow-notifications', true);
+  const [fontSize, setFontSize] = useLocalStorage<'small' | 'medium' | 'large'>('dailyflow-fontSize', 'medium');
+  const [defaultReminder, setDefaultReminder] = useLocalStorage<number>('dailyflow-reminder', 15);
+  
+  // Non-persistent UI state
   const [todayMood, setTodayMood] = useState<MoodType | null>(null);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
   const [showPoints, setShowPoints] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [journalText, setJournalText] = useState('');
   const [searchTags, setSearchTags] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'card'>('card');
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
-  // Settings
-  const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [fontSize, setFontSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const { t, isRTL } = useTranslation(language);
+  const dateLocale = dateLocales[language] || enUS;
+
+  // Determine dark mode from theme mode
+  const darkMode = themeMode === 'dark' || 
+    (themeMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   // Apply dark mode
   useEffect(() => {
@@ -53,16 +74,29 @@ const Index = () => {
     }
   }, [darkMode]);
 
+  // Apply RTL
+  useEffect(() => {
+    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+  }, [isRTL]);
+
   // Apply font size
   useEffect(() => {
     const sizes = { small: '14px', medium: '16px', large: '18px' };
     document.documentElement.style.fontSize = sizes[fontSize];
   }, [fontSize]);
 
+  // Check for today's mood
+  useEffect(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const todayEntry = moods.find(m => format(new Date(m.date), 'yyyy-MM-dd') === today);
+    if (todayEntry) {
+      setTodayMood(todayEntry.mood);
+    }
+  }, [moods]);
+
   const completedToday = tasks.filter(t => t.completed).length;
-  const pendingTasks = tasks.filter(t => !t.completed);
   const todayTasks = tasks.filter(t => 
-    format(t.dueDate, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
+    format(new Date(t.dueDate), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
   );
 
   const filteredTasks = filterCategory === 'all' 
@@ -83,11 +117,11 @@ const Index = () => {
       }
       return task;
     }));
-  }, []);
+  }, [setTasks, setTotalPoints]);
 
   const handleDeleteTask = useCallback((id: string) => {
     setTasks(prev => prev.filter(t => t.id !== id));
-  }, []);
+  }, [setTasks]);
 
   const handleAddTask = useCallback((task: Omit<Task, 'id' | 'completed' | 'completedAt'>) => {
     const newTask: Task = {
@@ -96,7 +130,7 @@ const Index = () => {
       completed: false,
     };
     setTasks(prev => [newTask, ...prev]);
-  }, []);
+  }, [setTasks]);
 
   const handleMoodSelect = useCallback((mood: MoodType) => {
     setTodayMood(mood);
@@ -106,9 +140,9 @@ const Index = () => {
       mood,
     };
     setMoods(prev => [newEntry, ...prev.filter(m => 
-      format(m.date, 'yyyy-MM-dd') !== format(new Date(), 'yyyy-MM-dd')
+      format(new Date(m.date), 'yyyy-MM-dd') !== format(new Date(), 'yyyy-MM-dd')
     )]);
-  }, []);
+  }, [setMoods]);
 
   const handleSaveJournal = useCallback(() => {
     if (!journalText.trim()) return;
@@ -122,7 +156,7 @@ const Index = () => {
     };
     setJournalEntries(prev => [newEntry, ...prev]);
     setJournalText('');
-  }, [journalText]);
+  }, [journalText, setJournalEntries]);
 
   const filteredJournalEntries = searchTags
     ? journalEntries.filter(e => 
@@ -133,13 +167,24 @@ const Index = () => {
 
   const greetingMessage = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return t('goodMorning');
+    if (hour < 17) return t('goodAfternoon');
+    return t('goodEvening');
+  };
+
+  const getCategoryLabel = (cat: string) => {
+    const labels: Record<string, string> = {
+      all: t('all'),
+      work: t('work'),
+      personal: t('personal'),
+      health: t('health'),
+      other: t('other'),
+    };
+    return labels[cat] || cat;
   };
 
   return (
-    <div className="min-h-screen pb-28 relative">
+    <div className={cn("min-h-screen pb-28 relative", isRTL && "rtl")} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Mesh Background */}
       <div className="mesh-background" />
 
@@ -155,11 +200,13 @@ const Index = () => {
         isOpen={isAddTaskOpen}
         onClose={() => setIsAddTaskOpen(false)}
         onAdd={handleAddTask}
+        t={t}
+        language={language}
       />
 
       {/* Floating Action Button */}
       {activeTab !== 'settings' && (
-        <FloatingActionButton onClick={() => setIsAddTaskOpen(true)} />
+        <FloatingActionButton onClick={() => setIsAddTaskOpen(true)} isRTL={isRTL} />
       )}
 
       {/* Main Content */}
@@ -168,9 +215,9 @@ const Index = () => {
           {activeTab === 'dashboard' && (
             <motion.div
               key="dashboard"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
               transition={{ duration: 0.3 }}
               className="space-y-5"
             >
@@ -181,7 +228,7 @@ const Index = () => {
                   animate={{ opacity: 1, y: 0 }}
                   className="text-muted-foreground text-sm"
                 >
-                  {format(new Date(), 'EEEE, MMMM d')}
+                  {format(new Date(), 'EEEE, MMMM d', { locale: dateLocale })}
                 </motion.p>
                 <motion.h1 
                   initial={{ opacity: 0, y: -10 }}
@@ -196,17 +243,17 @@ const Index = () => {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-3">
                 <StatsCard
-                  title="Points"
+                  title={t('points')}
                   value={totalPoints}
                   icon={Zap}
                   gradient="from-primary to-blue-600"
                   delay={0}
                 />
                 <StatsCard
-                  title="Streak"
+                  title={t('dayStreak')}
                   value={`${streak} 🔥`}
                   icon={Flame}
-                  subtitle="days"
+                  subtitle={t('days')}
                   gradient="from-secondary to-rose-500"
                   delay={0.1}
                 />
@@ -217,7 +264,7 @@ const Index = () => {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm">
                     <Sparkles className="w-4 h-4 text-primary" />
-                    How are you feeling?
+                    {t('howAreYouFeeling')}
                   </h3>
                   {todayMood && (
                     <motion.span
@@ -237,14 +284,13 @@ const Index = () => {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-semibold text-foreground flex items-center gap-2 text-sm">
                     <Target className="w-4 h-4 text-primary" />
-                    Today's Tasks
+                    {t('todaysTasks')}
                   </h3>
                   <span className="text-sm text-muted-foreground">
                     {completedToday}/{todayTasks.length}
                   </span>
                 </div>
                 
-                {/* Progress Bar */}
                 {todayTasks.length > 0 && (
                   <div className="h-1.5 bg-muted rounded-full mb-3 overflow-hidden">
                     <motion.div
@@ -274,8 +320,8 @@ const Index = () => {
                       className="text-center py-8 text-muted-foreground"
                     >
                       <Calendar className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">No tasks for today</p>
-                      <p className="text-xs mt-1">Tap + to add your first task</p>
+                      <p className="text-sm">{t('noTasksToday')}</p>
+                      <p className="text-xs mt-1">{t('tapToAddFirst')}</p>
                     </motion.div>
                   )}
                 </div>
@@ -286,11 +332,11 @@ const Index = () => {
                 <div>
                   <h3 className="font-semibold text-foreground flex items-center gap-2 mb-3 text-sm">
                     <TrendingUp className="w-4 h-4 text-primary" />
-                    Recent Moods
+                    {t('recentMoods')}
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     {moods.slice(0, 4).map((entry, index) => (
-                      <MoodCard key={entry.id} entry={entry} index={index} />
+                      <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} />
                     ))}
                   </div>
                 </div>
@@ -301,23 +347,21 @@ const Index = () => {
           {activeTab === 'tasks' && (
             <motion.div
               key="tasks"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold text-foreground">Tasks</h1>
-                <div className="flex gap-2">
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}
-                    className="p-2 rounded-xl bg-muted/50"
-                  >
-                    <Filter className="w-4 h-4 text-muted-foreground" />
-                  </motion.button>
-                </div>
+                <h1 className="text-2xl font-bold text-foreground">{t('tasks')}</h1>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}
+                  className="p-2 rounded-xl bg-muted/50"
+                >
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                </motion.button>
               </div>
 
               {/* Filter Pills */}
@@ -334,7 +378,7 @@ const Index = () => {
                         : 'bg-muted/50 text-muted-foreground'
                     )}
                   >
-                    {cat === 'all' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    {getCategoryLabel(cat)}
                   </motion.button>
                 ))}
               </div>
@@ -343,7 +387,7 @@ const Index = () => {
               {filteredTasks.filter(t => !t.completed).length > 0 && (
                 <div>
                   <h3 className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">
-                    Pending ({filteredTasks.filter(t => !t.completed).length})
+                    {t('pending')} ({filteredTasks.filter(t => !t.completed).length})
                   </h3>
                   <div className="space-y-2">
                     {filteredTasks.filter(t => !t.completed).map((task, index) => (
@@ -363,7 +407,7 @@ const Index = () => {
               {filteredTasks.filter(t => t.completed).length > 0 && (
                 <div>
                   <h3 className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">
-                    Completed ({filteredTasks.filter(t => t.completed).length})
+                    {t('completed')} ({filteredTasks.filter(t => t.completed).length})
                   </h3>
                   <div className="space-y-2">
                     {filteredTasks.filter(t => t.completed).map((task, index) => (
@@ -386,42 +430,53 @@ const Index = () => {
                   className="text-center py-12 text-muted-foreground"
                 >
                   <Target className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>No tasks yet</p>
-                  <p className="text-sm mt-1">Tap + to add your first task</p>
+                  <p>{t('noTasksYet')}</p>
+                  <p className="text-sm mt-1">{t('tapToAddFirst')}</p>
                 </motion.div>
               )}
             </motion.div>
           )}
 
+          {activeTab === 'calendar' && (
+            <CalendarView
+              key="calendar"
+              tasks={tasks}
+              language={language}
+              t={t}
+              onAddTask={() => setIsAddTaskOpen(true)}
+              onSelectTask={(task) => handleCompleteTask(task.id)}
+            />
+          )}
+
           {activeTab === 'mood' && (
             <motion.div
               key="mood"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
               transition={{ duration: 0.3 }}
               className="space-y-5"
             >
-              <h1 className="text-2xl font-bold text-foreground">Mood Tracker</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t('moodTracker')}</h1>
 
               <GlassCard className="!p-5">
-                <h3 className="font-semibold text-foreground mb-4 text-sm">Today's Mood</h3>
+                <h3 className="font-semibold text-foreground mb-4 text-sm">{t('todaysMood')}</h3>
                 <MoodSelector selectedMood={todayMood} onSelect={handleMoodSelect} />
               </GlassCard>
 
               <div>
-                <h3 className="font-semibold text-foreground mb-3 text-sm">Mood History</h3>
+                <h3 className="font-semibold text-foreground mb-3 text-sm">{t('moodHistory')}</h3>
                 {moods.length > 0 ? (
                   <div className="space-y-2">
                     {moods.map((entry, index) => (
-                      <MoodCard key={entry.id} entry={entry} index={index} />
+                      <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} />
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
                     <Sparkles className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">No mood entries yet</p>
-                    <p className="text-xs mt-1">Track your first mood above</p>
+                    <p className="text-sm">{t('noMoodEntriesYet')}</p>
+                    <p className="text-xs mt-1">{t('trackYourFirstMood')}</p>
                   </div>
                 )}
               </div>
@@ -431,21 +486,22 @@ const Index = () => {
           {activeTab === 'journal' && (
             <motion.div
               key="journal"
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
+              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
               transition={{ duration: 0.3 }}
               className="space-y-5"
             >
-              <h1 className="text-2xl font-bold text-foreground">Journal</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t('journal')}</h1>
               
               <GlassCard className="!p-4">
-                <h3 className="font-semibold text-foreground mb-3 text-sm">Quick Note</h3>
+                <h3 className="font-semibold text-foreground mb-3 text-sm">{t('quickNote')}</h3>
                 <textarea
                   value={journalText}
                   onChange={(e) => setJournalText(e.target.value)}
-                  placeholder="What's on your mind? Use #tags to organize..."
+                  placeholder={t('whatsOnYourMind')}
                   className="w-full h-24 px-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none text-foreground placeholder:text-muted-foreground text-sm"
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 />
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -454,80 +510,105 @@ const Index = () => {
                   disabled={!journalText.trim()}
                   className="mt-3 glass-button-primary w-full py-3 disabled:opacity-50"
                 >
-                  Save Entry
+                  {t('saveEntry')}
                 </motion.button>
               </GlassCard>
 
               {/* Search */}
-              {journalEntries.length > 0 && (
+              <div className="relative">
+                <Search className={cn(
+                  "absolute top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground",
+                  isRTL ? "right-4" : "left-4"
+                )} />
                 <input
                   type="text"
                   value={searchTags}
                   onChange={(e) => setSearchTags(e.target.value)}
-                  placeholder="Search by tags or text..."
-                  className="w-full px-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary outline-none text-foreground placeholder:text-muted-foreground text-sm"
+                  placeholder={t('searchByTags')}
+                  className={cn(
+                    "w-full py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground text-sm",
+                    isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
+                  )}
+                  dir={isRTL ? 'rtl' : 'ltr'}
                 />
-              )}
-
-              {/* Entries */}
-              <div className="space-y-3">
-                {filteredJournalEntries.map((entry, index) => (
-                  <motion.div
-                    key={entry.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <GlassCard className="!p-4">
-                      <p className="text-xs text-muted-foreground mb-2">
-                        {format(entry.date, 'MMM d, h:mm a')}
-                      </p>
-                      <p className="text-foreground text-sm">{entry.text}</p>
-                      {entry.tags.length > 0 && (
-                        <div className="flex gap-2 mt-2 flex-wrap">
-                          {entry.tags.map(tag => (
-                            <span
-                              key={tag}
-                              className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </GlassCard>
-                  </motion.div>
-                ))}
               </div>
 
-              {journalEntries.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p className="text-sm">Your journal entries will appear here</p>
-                </div>
-              )}
+              {/* Entries */}
+              <div>
+                <h3 className="font-semibold text-foreground mb-3 text-sm">{t('yourEntries')}</h3>
+                {filteredJournalEntries.length > 0 ? (
+                  <div className="space-y-2">
+                    {filteredJournalEntries.map((entry, index) => (
+                      <motion.div
+                        key={entry.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                      >
+                        <GlassCard className="!p-4">
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {format(new Date(entry.date), 'PPP', { locale: dateLocale })}
+                          </p>
+                          <p className="text-foreground text-sm leading-relaxed">{entry.text}</p>
+                          {entry.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {entry.tags.map((tag, i) => (
+                                <span
+                                  key={i}
+                                  className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
+                                >
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </GlassCard>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Sparkles className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">{t('noEntriesYet')}</p>
+                    <p className="text-xs mt-1">{t('startWriting')}</p>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
 
           {activeTab === 'settings' && (
             <SettingsPage
               darkMode={darkMode}
-              onDarkModeChange={setDarkMode}
+              onDarkModeChange={(value) => setThemeMode(value ? 'dark' : 'light')}
+              themeMode={themeMode}
+              onThemeModeChange={setThemeMode}
               notifications={notifications}
               onNotificationsChange={setNotifications}
               fontSize={fontSize}
               onFontSizeChange={setFontSize}
+              language={language}
+              onLanguageChange={setLanguage}
+              defaultReminder={defaultReminder}
+              onDefaultReminderChange={setDefaultReminder}
               stats={{
                 totalPoints,
                 streak,
                 tasksCompleted: tasks.filter(t => t.completed).length,
               }}
+              t={t}
             />
           )}
         </AnimatePresence>
       </main>
 
       {/* Bottom Navigation */}
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navigation 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+        t={t}
+        isRTL={isRTL}
+      />
     </div>
   );
 };
