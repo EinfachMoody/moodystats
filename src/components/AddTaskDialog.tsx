@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, Repeat } from 'lucide-react';
-import { Task, TaskCategory, TaskPriority, RepeatType, CATEGORY_LABELS, PRIORITY_LABELS, REPEAT_LABELS } from '@/types';
+import { Task, TaskCategory, TaskPriority, RepeatType } from '@/types';
+import { Language } from '@/i18n/translations';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -9,6 +10,8 @@ interface AddTaskDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onAdd: (task: Omit<Task, 'id' | 'completed' | 'completedAt'>) => void;
+  t: (key: string) => string;
+  language: Language;
 }
 
 const categories: TaskCategory[] = ['work', 'personal', 'health', 'other'];
@@ -28,7 +31,7 @@ const priorityPoints: Record<TaskPriority, number> = {
   low: 10,
 };
 
-export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) => {
+export const AddTaskDialog = ({ isOpen, onClose, onAdd, t, language }: AddTaskDialogProps) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<TaskCategory>('personal');
@@ -38,13 +41,43 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
   const [repeat, setRepeat] = useState<RepeatType>('none');
   const [isSaving, setIsSaving] = useState(false);
 
+  const isRTL = language === 'ar';
+
+  const getCategoryLabel = (cat: TaskCategory) => {
+    const labels: Record<TaskCategory, string> = {
+      work: t('work'),
+      personal: t('personal'),
+      health: t('health'),
+      other: t('other'),
+    };
+    return labels[cat];
+  };
+
+  const getPriorityLabel = (p: TaskPriority) => {
+    const labels: Record<TaskPriority, string> = {
+      high: t('high'),
+      medium: t('medium'),
+      low: t('low'),
+    };
+    return labels[p];
+  };
+
+  const getRepeatLabel = (r: RepeatType) => {
+    const labels: Record<RepeatType, string> = {
+      none: t('never'),
+      daily: t('daily'),
+      weekly: t('weekly'),
+      monthly: t('monthly'),
+    };
+    return labels[r];
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
 
     setIsSaving(true);
     
-    // Wait for animation
     await new Promise(resolve => setTimeout(resolve, 300));
 
     onAdd({
@@ -58,7 +91,6 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
       points: priorityPoints[priority],
     });
 
-    // Reset form
     setTitle('');
     setDescription('');
     setCategory('personal');
@@ -74,7 +106,6 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -83,7 +114,6 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
             className="fixed inset-0 bg-foreground/20 backdrop-blur-md z-50"
           />
 
-          {/* Dialog - Bottom Sheet Style for iPhone */}
           <motion.div
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,18 +123,17 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
               "fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto",
               isSaving && "animate-pulse"
             )}
+            dir={isRTL ? 'rtl' : 'ltr'}
           >
             <motion.div 
               className="glass-card rounded-t-3xl rounded-b-none p-6 pb-8"
               animate={isSaving ? { scale: [1, 1.02, 0.98, 1] } : {}}
               transition={{ duration: 0.3 }}
             >
-              {/* Handle */}
               <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full mx-auto mb-4" />
               
-              {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">New Task</h2>
+                <h2 className="text-xl font-semibold text-foreground">{t('addNewTask')}</h2>
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
@@ -116,39 +145,36 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Title */}
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
-                    Task Title
+                    {t('taskTitle')}
                   </label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="What needs to be done?"
+                    placeholder={t('whatNeedsToBeDone')}
                     className="w-full px-4 py-3.5 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground placeholder:text-muted-foreground text-base"
                     autoFocus
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
-                    Description (optional)
+                    {t('description')}
                   </label>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Add more details..."
+                    placeholder={t('optionalDetails')}
                     rows={2}
                     className="w-full px-4 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
 
-                {/* Category */}
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
-                    Category
+                    {t('category')}
                   </label>
                   <div className="flex gap-2 flex-wrap">
                     {categories.map((cat) => (
@@ -164,16 +190,15 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
                             : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                         )}
                       >
-                        {CATEGORY_LABELS[cat]}
+                        {getCategoryLabel(cat)}
                       </motion.button>
                     ))}
                   </div>
                 </div>
 
-                {/* Priority */}
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
-                    Priority
+                    {t('priority')}
                   </label>
                   <div className="flex gap-2">
                     {priorities.map((p) => (
@@ -189,7 +214,7 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
                             : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                         )}
                       >
-                        {PRIORITY_LABELS[p]}
+                        {getPriorityLabel(p)}
                         <span className="block text-xs opacity-70 mt-0.5">
                           +{priorityPoints[p]} pts
                         </span>
@@ -198,46 +223,54 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
                   </div>
                 </div>
 
-                {/* Date & Time Row */}
                 <div className="grid grid-cols-2 gap-3">
-                  {/* Due Date */}
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Date
+                      {t('dueDate')}
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Calendar className={cn(
+                        "absolute top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground",
+                        isRTL ? "right-4" : "left-4"
+                      )} />
                       <input
                         type="date"
                         value={dueDate}
                         onChange={(e) => setDueDate(e.target.value)}
-                        className="w-full pl-11 pr-3 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground text-sm"
+                        className={cn(
+                          "w-full py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground text-sm",
+                          isRTL ? "pr-11 pl-3" : "pl-11 pr-3"
+                        )}
                       />
                     </div>
                   </div>
 
-                  {/* Time */}
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Time
+                      {t('dueTime')}
                     </label>
                     <div className="relative">
-                      <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Clock className={cn(
+                        "absolute top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground",
+                        isRTL ? "right-4" : "left-4"
+                      )} />
                       <input
                         type="time"
                         value={dueTime}
                         onChange={(e) => setDueTime(e.target.value)}
-                        className="w-full pl-11 pr-3 py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground text-sm"
+                        className={cn(
+                          "w-full py-3 rounded-2xl bg-muted/50 border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-foreground text-sm",
+                          isRTL ? "pr-11 pl-3" : "pl-11 pr-3"
+                        )}
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Repeat */}
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
                     <Repeat className="w-4 h-4" />
-                    Repeat
+                    {t('repeat')}
                   </label>
                   <div className="flex gap-2 flex-wrap">
                     {repeatOptions.map((r) => (
@@ -253,13 +286,12 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
                             : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                         )}
                       >
-                        {REPEAT_LABELS[r]}
+                        {getRepeatLabel(r)}
                       </motion.button>
                     ))}
                   </div>
                 </div>
 
-                {/* Submit Button */}
                 <motion.button
                   type="submit"
                   disabled={isSaving}
@@ -267,7 +299,7 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd }: AddTaskDialogProps) =>
                   whileTap={{ scale: 0.98 }}
                   className="w-full glass-button-primary flex items-center justify-center gap-2 py-4 text-base font-semibold"
                 >
-                  {isSaving ? 'Saving...' : 'Add Task'}
+                  {isSaving ? '...' : t('addTask')}
                 </motion.button>
               </form>
             </motion.div>
