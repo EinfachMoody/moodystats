@@ -23,6 +23,7 @@ import { PointsAnimation } from '@/components/PointsAnimation';
 import { FloatingActionButton } from '@/components/FloatingActionButton';
 import { SettingsPage } from '@/components/SettingsPage';
 import { CalendarView } from '@/components/CalendarView';
+import { StatsPage } from '@/components/StatsPage';
 import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS } from '@/types';
 import { Language } from '@/i18n/translations';
 import { useTranslation } from '@/hooks/useTranslation';
@@ -445,6 +446,19 @@ const Index = () => {
               t={t}
               onAddTask={() => setIsAddTaskOpen(true)}
               onSelectTask={(task) => handleCompleteTask(task.id)}
+            />
+          )}
+
+          {activeTab === 'stats' && (
+            <StatsPage
+              key="stats"
+              tasks={tasks}
+              moods={moods}
+              totalPoints={totalPoints}
+              streak={streak}
+              t={t}
+              locale={dateLocale}
+              isRTL={isRTL}
             />
           )}
 

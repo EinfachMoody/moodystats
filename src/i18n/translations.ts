@@ -132,10 +132,18 @@ export const translations = {
     dayStreak: 'Day Streak',
     
     // Stats
+    statistics: 'Statistics',
+    stats: 'Stats',
     totalPoints: 'Total Points',
     currentStreak: 'Current Streak',
     tasksCompleted: 'Tasks Completed',
     days: 'days',
+    thisWeek: 'This Week',
+    moodOverview: 'Mood Overview',
+    byCategory: 'By Category',
+    productivity: 'Productivity',
+    noDataYet: 'No data yet',
+    startTracking: 'Start tracking to see insights',
   },
   
   de: {
@@ -240,9 +248,17 @@ export const translations = {
     points: 'Punkte',
     dayStreak: 'Tage-Serie',
     
+    statistics: 'Statistiken',
+    stats: 'Statistik',
     totalPoints: 'Gesamtpunkte',
     currentStreak: 'Aktuelle Serie',
     tasksCompleted: 'Erledigte Aufgaben',
+    thisWeek: 'Diese Woche',
+    moodOverview: 'Stimmungsübersicht',
+    byCategory: 'Nach Kategorie',
+    productivity: 'Produktivität',
+    noDataYet: 'Noch keine Daten',
+    startTracking: 'Beginne zu tracken für Einblicke',
     days: 'Tage',
   },
   
@@ -348,10 +364,18 @@ export const translations = {
     points: 'Points',
     dayStreak: 'Série de jours',
     
+    statistics: 'Statistiques',
+    stats: 'Stats',
     totalPoints: 'Points totaux',
     currentStreak: 'Série actuelle',
     tasksCompleted: 'Tâches terminées',
     days: 'jours',
+    thisWeek: 'Cette semaine',
+    moodOverview: "Aperçu de l'humeur",
+    byCategory: 'Par catégorie',
+    productivity: 'Productivité',
+    noDataYet: 'Pas de données',
+    startTracking: 'Commence à suivre pour voir les insights',
   },
   
   es: {
@@ -456,10 +480,18 @@ export const translations = {
     points: 'Puntos',
     dayStreak: 'Racha de días',
     
+    statistics: 'Estadísticas',
+    stats: 'Estadísticas',
     totalPoints: 'Puntos totales',
     currentStreak: 'Racha actual',
     tasksCompleted: 'Tareas completadas',
     days: 'días',
+    thisWeek: 'Esta semana',
+    moodOverview: 'Resumen de ánimo',
+    byCategory: 'Por categoría',
+    productivity: 'Productividad',
+    noDataYet: 'Sin datos aún',
+    startTracking: 'Empieza a rastrear para ver insights',
   },
   
   tr: {
@@ -564,10 +596,18 @@ export const translations = {
     points: 'Puan',
     dayStreak: 'Gün Serisi',
     
+    statistics: 'İstatistikler',
+    stats: 'İstatistik',
     totalPoints: 'Toplam Puan',
     currentStreak: 'Mevcut Seri',
     tasksCompleted: 'Tamamlanan Görevler',
     days: 'gün',
+    thisWeek: 'Bu Hafta',
+    moodOverview: 'Ruh Hali Özeti',
+    byCategory: 'Kategoriye Göre',
+    productivity: 'Verimlilik',
+    noDataYet: 'Henüz veri yok',
+    startTracking: 'İçgörüler için takip etmeye başla',
   },
   
   ar: {
@@ -672,9 +712,17 @@ export const translations = {
     points: 'النقاط',
     dayStreak: 'سلسلة الأيام',
     
+    statistics: 'الإحصائيات',
+    stats: 'إحصائيات',
     totalPoints: 'إجمالي النقاط',
     currentStreak: 'السلسلة الحالية',
     tasksCompleted: 'المهام المكتملة',
     days: 'أيام',
+    thisWeek: 'هذا الأسبوع',
+    moodOverview: 'نظرة عامة على المزاج',
+    byCategory: 'حسب الفئة',
+    productivity: 'الإنتاجية',
+    noDataYet: 'لا توجد بيانات بعد',
+    startTracking: 'ابدأ التتبع لرؤية الرؤى',
   },
 } as const;
