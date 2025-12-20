@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Daily Flow - iOS 26 Liquid Glass Design System v2 */
+/* Daily Flow - iOS 26 Liquid Glass Design System v3 */
 
 @layer base {
   :root {
@@ -40,13 +40,14 @@
     --ring: 199 100% 50%;
     --radius: 1.25rem;
 
-    /* Liquid Glass Variables - Enhanced */
-    --glass-bg: 0 0% 100% / 0.72;
-    --glass-border: 0 0% 100% / 0.5;
-    --glass-blur: 24px;
-    --glass-shadow: 0 8px 32px hsl(220 40% 20% / 0.12), 0 2px 8px hsl(220 40% 20% / 0.08);
-    --glass-highlight: 0 0% 100% / 0.4;
-    --glass-inner-shadow: inset 0 1px 1px hsl(0 0% 100% / 0.5);
+    /* Liquid Glass Variables - iOS 26 Style */
+    --glass-bg: 0 0% 100% / 0.75;
+    --glass-border: 0 0% 100% / 0.6;
+    --glass-blur: 28px;
+    --glass-shadow: 0 8px 40px hsl(220 40% 20% / 0.1), 0 2px 12px hsl(220 40% 20% / 0.06);
+    --glass-highlight: 0 0% 100% / 0.5;
+    --glass-inner-shadow: inset 0 1px 2px hsl(0 0% 100% / 0.6);
+    --glass-intensity: 1;
 
     /* Mood Colors */
     --mood-amazing: 142 76% 42%;
@@ -80,6 +81,13 @@
     --sidebar-accent-foreground: 220 25% 12%;
     --sidebar-border: 220 13% 90%;
     --sidebar-ring: 199 100% 50%;
+
+    /* Chart colors */
+    --chart-1: 199 100% 50%;
+    --chart-2: 142 76% 42%;
+    --chart-3: 262 83% 58%;
+    --chart-4: 32 100% 55%;
+    --chart-5: 0 84% 55%;
   }
 
   .dark {
@@ -108,11 +116,11 @@
     --input: 225 20% 16%;
     --ring: 199 100% 55%;
 
-    --glass-bg: 225 25% 12% / 0.75;
-    --glass-border: 0 0% 100% / 0.08;
-    --glass-shadow: 0 8px 32px hsl(0 0% 0% / 0.4), 0 2px 8px hsl(0 0% 0% / 0.3);
-    --glass-highlight: 0 0% 100% / 0.05;
-    --glass-inner-shadow: inset 0 1px 1px hsl(0 0% 100% / 0.1);
+    --glass-bg: 225 25% 12% / 0.8;
+    --glass-border: 0 0% 100% / 0.1;
+    --glass-shadow: 0 8px 40px hsl(0 0% 0% / 0.4), 0 2px 12px hsl(0 0% 0% / 0.25);
+    --glass-highlight: 0 0% 100% / 0.08;
+    --glass-inner-shadow: inset 0 1px 2px hsl(0 0% 100% / 0.12);
 
     --gradient-mesh: radial-gradient(ellipse 80% 50% at 20% 40%, hsl(199 100% 20% / 0.5) 0px, transparent 60%),
                      radial-gradient(ellipse 60% 50% at 80% 20%, hsl(262 83% 20% / 0.4) 0px, transparent 55%),
@@ -156,12 +164,12 @@
 }
 
 @layer components {
-  /* Enhanced Liquid Glass Card */
+  /* ===== LIQUID GLASS CARD SYSTEM ===== */
   .glass-card {
     @apply relative overflow-hidden;
     background: hsl(var(--glass-bg));
-    backdrop-filter: blur(var(--glass-blur)) saturate(180%);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+    backdrop-filter: blur(calc(var(--glass-blur) * var(--glass-intensity))) saturate(180%);
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * var(--glass-intensity))) saturate(180%);
     border: 1px solid hsl(var(--glass-border));
     border-radius: var(--radius);
     box-shadow: var(--glass-shadow), var(--glass-inner-shadow);
@@ -175,25 +183,148 @@
     background: linear-gradient(
       135deg, 
       hsl(var(--glass-highlight)) 0%, 
-      transparent 40%,
-      transparent 60%,
+      transparent 35%,
+      transparent 65%,
       hsl(0 0% 0% / 0.02) 100%
     );
   }
 
   .glass-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--glass-shadow), 0 16px 48px hsl(var(--primary) / 0.15);
+    box-shadow: var(--glass-shadow), 0 20px 60px hsl(var(--primary) / 0.12);
   }
 
-  /* Glass Input */
-  .glass-input {
-    @apply w-full px-4 py-3.5 rounded-2xl outline-none transition-all duration-300;
+  .glass-card-flat {
+    @apply relative overflow-hidden;
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1px solid hsl(var(--glass-border));
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px hsl(220 40% 20% / 0.06);
+  }
+
+  /* ===== UNIFIED BUTTON SYSTEM ===== */
+  .glass-button {
+    @apply relative overflow-hidden font-semibold transition-all duration-300;
+    @apply px-5 py-3.5 rounded-2xl;
+    @apply flex items-center justify-center gap-2;
+    @apply active:scale-95;
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1.5px solid hsl(var(--glass-border));
+    box-shadow: 0 4px 20px hsl(220 40% 20% / 0.08), var(--glass-inner-shadow);
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .glass-button::before {
+    content: '';
+    @apply absolute inset-0 pointer-events-none rounded-2xl;
+    background: linear-gradient(135deg, hsl(0 0% 100% / 0.2) 0%, transparent 50%);
+  }
+
+  .glass-button:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 12px 40px hsl(var(--primary) / 0.2);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  .glass-button:active {
+    transform: translateY(0) scale(0.97);
+    transition-duration: 0.1s;
+  }
+
+  .glass-button:disabled {
+    @apply opacity-50 pointer-events-none;
+    transform: none;
+  }
+
+  /* Primary Glass Button */
+  .glass-button-primary {
+    @apply text-white font-semibold;
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: 0 6px 24px hsl(var(--primary) / 0.4);
+  }
+
+  .glass-button-primary::before {
+    background: linear-gradient(135deg, hsl(0 0% 100% / 0.3) 0%, transparent 50%);
+  }
+
+  .glass-button-primary:hover {
+    box-shadow: 0 10px 40px hsl(var(--primary) / 0.5);
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  /* Secondary Glass Button */
+  .glass-button-secondary {
+    @apply text-foreground;
+    background: hsl(var(--muted) / 0.9);
+    border: 1.5px solid hsl(var(--border));
+  }
+
+  .glass-button-secondary:hover {
+    background: hsl(var(--muted));
+    box-shadow: 0 8px 28px hsl(var(--foreground) / 0.08);
+  }
+
+  /* Destructive Glass Button */
+  .glass-button-destructive {
+    @apply text-white;
+    background: linear-gradient(135deg, hsl(var(--destructive)), hsl(0 72% 45%));
+    border: none;
+    box-shadow: 0 6px 24px hsl(var(--destructive) / 0.4);
+  }
+
+  /* Icon Button */
+  .glass-button-icon {
+    @apply w-12 h-12 p-0 rounded-2xl;
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  /* Small Button */
+  .glass-button-sm {
+    @apply px-4 py-2.5 text-sm;
+    min-height: 40px;
+  }
+
+  /* ===== PILL BUTTONS ===== */
+  .glass-pill {
+    @apply px-4 py-2.5 rounded-full text-sm font-medium transition-all duration-300;
+    @apply active:scale-95;
     background: hsl(var(--glass-bg));
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1.5px solid hsl(var(--border));
+    border: 1px solid hsl(var(--glass-border));
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+
+  .glass-pill:hover {
+    transform: scale(1.03);
+    box-shadow: 0 4px 16px hsl(var(--foreground) / 0.08);
+  }
+
+  .glass-pill.active {
+    background: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 20px hsl(var(--primary) / 0.35);
+  }
+
+  /* ===== INPUT SYSTEM ===== */
+  .glass-input {
+    @apply w-full px-4 py-4 rounded-2xl outline-none transition-all duration-300;
+    @apply text-base;
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid hsl(var(--border) / 0.8);
     color: hsl(var(--foreground));
+    min-height: 52px;
   }
 
   .glass-input::placeholder {
@@ -202,138 +333,115 @@
 
   .glass-input:focus {
     border-color: hsl(var(--primary));
-    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15), var(--glass-shadow);
+    box-shadow: 0 0 0 4px hsl(var(--primary) / 0.12), var(--glass-shadow);
   }
 
-  /* Unified Glass Button System */
-  .glass-button {
-    @apply relative overflow-hidden font-semibold transition-all duration-300;
-    @apply px-5 py-3 rounded-2xl;
-    @apply flex items-center justify-center gap-2;
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
-    border: 1.5px solid hsl(var(--glass-border));
-    box-shadow: var(--glass-shadow);
-  }
-
-  .glass-button::before {
-    content: '';
-    @apply absolute inset-0 pointer-events-none rounded-2xl;
-    background: linear-gradient(135deg, hsl(0 0% 100% / 0.15) 0%, transparent 50%);
-  }
-
-  .glass-button:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 12px 40px hsl(var(--primary) / 0.25);
-    border-color: hsl(var(--primary) / 0.3);
-  }
-
-  .glass-button:active {
-    transform: translateY(0) scale(0.98);
-    transition-duration: 0.1s;
-  }
-
-  /* Primary Glass Button */
-  .glass-button-primary {
-    @apply text-white font-semibold;
-    background: var(--gradient-primary);
-    border: none;
-    box-shadow: 0 4px 20px hsl(var(--primary) / 0.35);
-  }
-
-  .glass-button-primary::before {
-    background: linear-gradient(135deg, hsl(0 0% 100% / 0.25) 0%, transparent 50%);
-  }
-
-  .glass-button-primary:hover {
-    box-shadow: 0 8px 32px hsl(var(--primary) / 0.5);
-    transform: translateY(-3px) scale(1.02);
-  }
-
-  /* Secondary Glass Button */
-  .glass-button-secondary {
-    @apply text-foreground;
-    background: hsl(var(--muted) / 0.8);
-    border: 1.5px solid hsl(var(--border));
-  }
-
-  .glass-button-secondary:hover {
+  /* ===== TOGGLE SYSTEM ===== */
+  .ios-toggle {
+    @apply relative w-14 h-8 rounded-full transition-all duration-300 cursor-pointer;
     background: hsl(var(--muted));
-    box-shadow: 0 8px 24px hsl(var(--foreground) / 0.1);
+    min-width: 56px;
   }
 
-  /* Pill Button */
-  .glass-pill {
-    @apply px-4 py-2 rounded-full text-sm font-medium transition-all duration-300;
-    background: hsl(var(--glass-bg));
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--glass-border));
+  .ios-toggle.active {
+    background: hsl(var(--primary));
+    box-shadow: 0 0 16px hsl(var(--primary) / 0.4);
   }
 
-  .glass-pill:hover {
-    transform: scale(1.05);
+  .ios-toggle::after {
+    content: '';
+    @apply absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow-lg transition-all duration-300;
   }
 
-  .glass-pill.active {
-    background: var(--gradient-primary);
-    color: white;
-    border-color: transparent;
-    box-shadow: 0 4px 16px hsl(var(--primary) / 0.3);
+  .ios-toggle.active::after {
+    transform: translateX(24px);
   }
 
-  /* Enhanced Mesh Background */
+  /* ===== MESH BACKGROUND ===== */
   .mesh-background {
     background: var(--gradient-mesh);
     @apply fixed inset-0 -z-10;
   }
 
-  /* Animated Glow Orbs */
+  /* ===== ANIMATIONS ===== */
   .glow-orb {
-    @apply absolute rounded-full blur-3xl opacity-60;
-    animation: orbFloat 20s ease-in-out infinite;
+    @apply absolute rounded-full blur-3xl opacity-50;
+    animation: orbFloat 25s ease-in-out infinite;
   }
 
   @keyframes orbFloat {
     0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(30px, -30px) scale(1.1); }
-    50% { transform: translate(-20px, 20px) scale(0.9); }
-    75% { transform: translate(20px, 10px) scale(1.05); }
+    25% { transform: translate(40px, -40px) scale(1.15); }
+    50% { transform: translate(-30px, 30px) scale(0.9); }
+    75% { transform: translate(30px, 15px) scale(1.08); }
   }
 
-  /* Floating Animation */
   .float-animation {
     animation: float 6s ease-in-out infinite;
   }
 
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-12px); }
   }
 
-  /* Bubble Pop Animation */
   .bubble-pop {
     animation: bubblePop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 
   @keyframes bubblePop {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); }
+    50% { transform: scale(1.3); }
     100% { transform: scale(0); opacity: 0; }
   }
 
-  /* Pulse Glow */
   .pulse-glow {
     animation: pulseGlow 2s ease-in-out infinite;
   }
 
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
-    50% { box-shadow: 0 0 40px hsl(var(--primary) / 0.5); }
+    0%, 100% { box-shadow: 0 0 24px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 48px hsl(var(--primary) / 0.5); }
   }
 
-  /* Enhanced Mood Card Gradients */
+  .page-transition {
+    animation: pageIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes pageIn {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--muted)) 0%,
+      hsl(var(--background)) 50%,
+      hsl(var(--muted)) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ===== TOUCH FEEDBACK ===== */
+  .touch-feedback {
+    @apply transition-all duration-150 active:scale-95 active:opacity-80;
+    touch-action: manipulation;
+  }
+
+  /* ===== MOOD CARDS ===== */
   .mood-amazing {
     background: linear-gradient(135deg, hsl(142 76% 88% / 0.9), hsl(172 66% 85% / 0.9));
     backdrop-filter: blur(12px);
@@ -359,86 +467,135 @@
     backdrop-filter: blur(12px);
   }
 
-  /* Task Category Pills - Enhanced */
+  /* ===== CATEGORY PILLS ===== */
   .category-work {
     @apply bg-purple-500/15 text-purple-600 dark:bg-purple-400/20 dark:text-purple-300;
-    border: 1px solid hsl(262 83% 58% / 0.2);
+    border: 1px solid hsl(262 83% 58% / 0.25);
   }
 
   .category-personal {
     @apply bg-blue-500/15 text-blue-600 dark:bg-blue-400/20 dark:text-blue-300;
-    border: 1px solid hsl(199 100% 50% / 0.2);
+    border: 1px solid hsl(199 100% 50% / 0.25);
   }
 
   .category-health {
     @apply bg-green-500/15 text-green-600 dark:bg-green-400/20 dark:text-green-300;
-    border: 1px solid hsl(142 76% 42% / 0.2);
+    border: 1px solid hsl(142 76% 42% / 0.25);
   }
 
   .category-other {
     @apply bg-gray-500/15 text-gray-600 dark:bg-gray-400/20 dark:text-gray-300;
-    border: 1px solid hsl(220 15% 50% / 0.2);
+    border: 1px solid hsl(220 15% 50% / 0.25);
   }
 
-  /* Page Transitions */
-  .page-transition {
-    animation: pageIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ===== PRIORITY INDICATORS ===== */
+  .priority-high {
+    @apply border-l-4 border-l-destructive;
   }
 
-  @keyframes pageIn {
-    from {
-      opacity: 0;
-      transform: translateY(24px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  .priority-medium {
+    @apply border-l-4 border-l-secondary;
   }
 
-  /* Shimmer Loading */
-  .shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--background)) 50%,
-      hsl(var(--muted)) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
+  .priority-low {
+    @apply border-l-4 border-l-accent;
   }
 
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  /* Touch Feedback */
-  .touch-feedback {
-    @apply transition-all duration-150 active:scale-95 active:opacity-80;
-  }
-
-  /* iOS Toggle Switch */
-  .ios-toggle {
-    @apply relative w-12 h-7 rounded-full transition-all duration-300;
-    background: hsl(var(--muted));
-  }
-
-  .ios-toggle.active {
-    background: hsl(var(--primary));
-  }
-
-  .ios-toggle::after {
-    content: '';
-    @apply absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-md transition-all duration-300;
-  }
-
-  .ios-toggle.active::after {
-    transform: translateX(20px);
-  }
-
-  /* Section Header */
+  /* ===== SECTION HEADER ===== */
   .section-header {
     @apply text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1 mb-3;
+  }
+
+  /* ===== SETTINGS GROUPS ===== */
+  .settings-group {
+    @apply glass-card !p-0 overflow-hidden;
+  }
+
+  .settings-group-header {
+    @apply px-4 py-2.5 bg-muted/30;
+  }
+
+  .settings-group-title {
+    @apply text-xs font-semibold text-muted-foreground uppercase tracking-wider;
+  }
+
+  .settings-row {
+    @apply flex items-center justify-between px-4 py-4 border-t border-border/30 hover:bg-muted/20 transition-colors;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .settings-row-clickable {
+    @apply cursor-pointer active:bg-muted/40;
+  }
+
+  /* ===== CHARTS ===== */
+  .chart-container {
+    @apply glass-card p-4;
+  }
+
+  .chart-legend-item {
+    @apply flex items-center gap-2 text-sm;
+  }
+
+  .chart-legend-dot {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  /* ===== FAB BUTTON ===== */
+  .fab-button {
+    @apply fixed z-50 w-16 h-16 rounded-3xl flex items-center justify-center;
+    background: var(--gradient-primary);
+    box-shadow: 0 10px 40px hsl(199 100% 50% / 0.45), 
+                0 4px 16px hsl(262 83% 55% / 0.3), 
+                inset 0 1px 2px hsl(0 0% 100% / 0.4);
+    touch-action: manipulation;
+  }
+
+  .fab-button::before {
+    content: '';
+    @apply absolute inset-0 rounded-3xl pointer-events-none;
+    background: linear-gradient(135deg, hsl(0 0% 100% / 0.3) 0%, transparent 50%);
+  }
+
+  /* ===== BOTTOM NAVIGATION ===== */
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-40 safe-area-bottom;
+  }
+
+  .bottom-nav-container {
+    @apply mx-3 mb-3;
+  }
+
+  .bottom-nav-bar {
+    @apply px-2 py-2 rounded-3xl;
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 0 8px 40px hsl(var(--foreground) / 0.1), 
+                0 2px 12px hsl(var(--foreground) / 0.05), 
+                var(--glass-inner-shadow);
+  }
+
+  .nav-item {
+    @apply relative flex flex-col items-center gap-1 px-3 py-2.5 rounded-2xl transition-all duration-300;
+    min-width: 56px;
+    min-height: 56px;
+    touch-action: manipulation;
+  }
+
+  .nav-item-active {
+    @apply text-primary;
+  }
+
+  .nav-item-inactive {
+    @apply text-muted-foreground;
+  }
+
+  .nav-indicator {
+    @apply absolute inset-0 rounded-2xl;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.15), hsl(262 83% 58% / 0.1));
+    border: 1px solid hsl(var(--primary) / 0.25);
   }
 }
