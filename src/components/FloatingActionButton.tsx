@@ -12,33 +12,32 @@ export const FloatingActionButton = ({ onClick, isRTL = false }: FloatingActionB
     <motion.button
       initial={{ scale: 0, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.4, type: 'spring', stiffness: 400, damping: 20 }}
-      whileHover={{ scale: 1.08 }}
+      transition={{ delay: 0.35, type: 'spring', stiffness: 400, damping: 22 }}
+      whileHover={{ scale: 1.06 }}
       whileTap={{ scale: 0.92 }}
       onClick={onClick}
       className={cn(
         "fab-button",
-        isRTL ? "left-5 bottom-28" : "right-5 bottom-28"
+        isRTL ? "left-4 bottom-24" : "right-4 bottom-24"
       )}
     >
       <motion.div
-        animate={{ rotate: [0, 0, 0] }}
         whileHover={{ rotate: 90 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.25 }}
       >
-        <Plus className="w-7 h-7 text-white" strokeWidth={2.5} />
+        <Plus className="w-6 h-6 text-white" strokeWidth={2.5} />
       </motion.div>
       
-      {/* Animated glow ring */}
+      {/* Subtle pulse ring */}
       <motion.div
-        className="absolute inset-0 rounded-3xl"
+        className="absolute inset-0 rounded-[1.25rem]"
         animate={{
           boxShadow: [
-            '0 0 0 0px hsl(199 100% 50% / 0.3)',
-            '0 0 0 8px hsl(199 100% 50% / 0)',
+            '0 0 0 0px hsl(211 100% 50% / 0.25)',
+            '0 0 0 6px hsl(211 100% 50% / 0)',
           ],
         }}
-        transition={{ duration: 1.5, repeat: Infinity }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
       />
     </motion.button>
   );
