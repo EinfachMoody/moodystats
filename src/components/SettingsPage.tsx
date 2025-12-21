@@ -78,7 +78,7 @@ export const SettingsPage = ({
   const [animationsEnabled, setAnimationsEnabled] = useState<'full' | 'reduced' | 'off'>('full');
   
   const currentLanguageInfo = LANGUAGES.find(l => l.code === language);
-  const isRTL = language === 'ar';
+  const isRTL = false; // RTL disabled for now
 
   const containerVariants = {
     hidden: { opacity: 0 },

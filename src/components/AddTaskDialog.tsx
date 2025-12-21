@@ -41,7 +41,7 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd, t, language }: AddTaskDi
   const [repeat, setRepeat] = useState<RepeatType>('none');
   const [isSaving, setIsSaving] = useState(false);
 
-  const isRTL = language === 'ar';
+  const isRTL = false; // RTL disabled for now
 
   const getCategoryLabel = (cat: TaskCategory) => {
     const labels: Record<TaskCategory, string> = {

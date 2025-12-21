@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -8,15 +9,16 @@ interface GlassCardProps extends HTMLMotionProps<'div'> {
   glowColor?: string;
 }
 
-export const GlassCard = ({
+export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(({
   children,
   className,
   hoverable = false,
   glowColor,
   ...props
-}: GlassCardProps) => {
+}, ref) => {
   return (
     <motion.div
+      ref={ref}
       className={cn(
         'glass-card p-6',
         hoverable && 'cursor-pointer transition-all duration-300 hover:shadow-glass-lg hover:-translate-y-1',
@@ -31,4 +33,6 @@ export const GlassCard = ({
       {children}
     </motion.div>
   );
-};
+});
+
+GlassCard.displayName = 'GlassCard';
