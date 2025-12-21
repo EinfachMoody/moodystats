@@ -23,7 +23,7 @@ import {
   startOfDay,
   addDays
 } from 'date-fns';
-import { de, enUS, fr, es, tr, ar } from 'date-fns/locale';
+import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
 import { GlassCard } from './GlassCard';
 import { Task, CATEGORY_LABELS } from '@/types';
 import { Language } from '@/i18n/translations';
@@ -39,13 +39,13 @@ interface CalendarViewProps {
 
 type ViewMode = 'month' | 'week' | 'day';
 
-const locales = {
+const locales: Record<string, typeof enUS> = {
   de,
   en: enUS,
   fr,
   es,
-  tr,
-  ar,
+  it,
+  nl,
 };
 
 export const CalendarView = ({ 
@@ -60,7 +60,7 @@ export const CalendarView = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const locale = locales[language] || enUS;
-  const isRTL = language === 'ar';
+  const isRTL = false; // RTL disabled for now
 
   const days = useMemo(() => {
     if (viewMode === 'month') {

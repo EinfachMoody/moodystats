@@ -10,8 +10,8 @@ import {
   Filter,
   Search
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { de, enUS, fr, es, tr, ar } from 'date-fns/locale';
+import { format, Locale } from 'date-fns';
+import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
 import { Navigation } from '@/components/Navigation';
 import { GlassCard } from '@/components/GlassCard';
 import { TaskCard } from '@/components/TaskCard';
@@ -24,13 +24,14 @@ import { FloatingActionButton } from '@/components/FloatingActionButton';
 import { SettingsPage } from '@/components/SettingsPage';
 import { CalendarView } from '@/components/CalendarView';
 import { StatsPage } from '@/components/StatsPage';
+import { UndoToast } from '@/components/UndoToast';
 import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS } from '@/types';
 import { Language } from '@/i18n/translations';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { cn } from '@/lib/utils';
 
-const dateLocales = { de, en: enUS, fr, es, tr, ar };
+const dateLocales: Record<string, Locale> = { de, en: enUS, fr, es, it, nl };
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -58,6 +59,9 @@ const Index = () => {
   const [searchTags, setSearchTags] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'card'>('card');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [deletedTask, setDeletedTask] = useState<Task | null>(null);
+  const [showUndoToast, setShowUndoToast] = useState(false);
+  const [isAddingTask, setIsAddingTask] = useState(false);
 
   const { t, isRTL } = useTranslation(language);
   const dateLocale = dateLocales[language] || enUS;
@@ -121,17 +125,43 @@ const Index = () => {
   }, [setTasks, setTotalPoints]);
 
   const handleDeleteTask = useCallback((id: string) => {
-    setTasks(prev => prev.filter(t => t.id !== id));
-  }, [setTasks]);
+    const taskToDelete = tasks.find(t => t.id === id);
+    if (taskToDelete) {
+      setDeletedTask(taskToDelete);
+      setShowUndoToast(true);
+      setTasks(prev => prev.filter(t => t.id !== id));
+      
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        setShowUndoToast(false);
+        setDeletedTask(null);
+      }, 5000);
+    }
+  }, [tasks, setTasks]);
+
+  const handleUndoDelete = useCallback(() => {
+    if (deletedTask) {
+      setTasks(prev => [deletedTask, ...prev]);
+      setDeletedTask(null);
+      setShowUndoToast(false);
+    }
+  }, [deletedTask, setTasks]);
 
   const handleAddTask = useCallback((task: Omit<Task, 'id' | 'completed' | 'completedAt'>) => {
+    // Prevent double-tap duplicate entries
+    if (isAddingTask) return;
+    setIsAddingTask(true);
+    
     const newTask: Task = {
       ...task,
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       completed: false,
     };
     setTasks(prev => [newTask, ...prev]);
-  }, [setTasks]);
+    
+    // Reset after short delay
+    setTimeout(() => setIsAddingTask(false), 500);
+  }, [setTasks, isAddingTask]);
 
   const handleMoodSelect = useCallback((mood: MoodType) => {
     setTodayMood(mood);
@@ -185,9 +215,18 @@ const Index = () => {
   };
 
   return (
-    <div className={cn("min-h-screen pb-28 relative", isRTL && "rtl")} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={cn("min-h-screen pb-28 relative safe-area-top", isRTL && "rtl")} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Mesh Background */}
       <div className="mesh-background" />
+
+      {/* Undo Toast */}
+      <UndoToast
+        show={showUndoToast}
+        message={t('taskDeleted')}
+        undoLabel={t('undo')}
+        onUndo={handleUndoDelete}
+        onDismiss={() => { setShowUndoToast(false); setDeletedTask(null); }}
+      />
 
       {/* Points Animation */}
       <PointsAnimation 
