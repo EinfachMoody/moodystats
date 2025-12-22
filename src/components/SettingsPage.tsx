@@ -5,33 +5,34 @@ import {
   Sun, 
   Bell, 
   Type, 
-  Trophy, 
-  Zap, 
-  Flame, 
-  Target,
   Globe,
   ChevronRight,
-  Calendar,
   Info,
   Monitor,
   Palette,
-  Sliders,
   Shield,
   Trash2,
   Download,
   Upload,
   RefreshCw,
   ChevronLeft,
-  Sparkles,
   Clock,
-  Tag,
-  CheckSquare,
   Database,
-  Smartphone
+  Smartphone,
+  Zap,
+  Flame,
+  Target,
+  Sliders,
+  LayoutList,
+  LayoutGrid,
+  CreditCard,
+  Droplets
 } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { LanguageSelector } from './LanguageSelector';
+import { ColorPicker } from './ColorPicker';
 import { Language, LANGUAGES } from '@/i18n/translations';
+import { AppSettings, TaskViewMode, TextSize, UIDensity, GlassIntensity } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface SettingsPageProps {
@@ -47,6 +48,9 @@ interface SettingsPageProps {
   onLanguageChange: (value: Language) => void;
   defaultReminder: number;
   onDefaultReminderChange: (value: number) => void;
+  appSettings: AppSettings;
+  onSettingsChange: (settings: Partial<AppSettings>) => void;
+  onResetSettings: (type: 'colors' | 'layout' | 'all') => void;
   stats: {
     totalPoints: number;
     streak: number;
@@ -55,7 +59,7 @@ interface SettingsPageProps {
   t: (key: string) => string;
 }
 
-type SettingsView = 'main' | 'language' | 'appearance' | 'tasks' | 'reminders' | 'calendar' | 'privacy' | 'advanced' | 'software';
+type SettingsView = 'main' | 'language' | 'appearance' | 'customization' | 'colors' | 'privacy' | 'software';
 
 export const SettingsPage = ({
   darkMode,
@@ -70,15 +74,17 @@ export const SettingsPage = ({
   onLanguageChange,
   defaultReminder,
   onDefaultReminderChange,
+  appSettings,
+  onSettingsChange,
+  onResetSettings,
   stats,
   t,
 }: SettingsPageProps) => {
   const [currentView, setCurrentView] = useState<SettingsView>('main');
-  const [glassIntensity, setGlassIntensity] = useState<'light' | 'medium' | 'strong'>('medium');
-  const [animationsEnabled, setAnimationsEnabled] = useState<'full' | 'reduced' | 'off'>('full');
+  const [showColorPicker, setShowColorPicker] = useState(false);
   
   const currentLanguageInfo = LANGUAGES.find(l => l.code === language);
-  const isRTL = false; // RTL disabled for now
+  const isRTL = false;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -90,7 +96,6 @@ export const SettingsPage = ({
     visible: { opacity: 1, y: 0 }
   };
 
-  // Back button component
   const BackButton = ({ title }: { title: string }) => (
     <motion.button
       initial={{ opacity: 0, x: -10 }}
@@ -103,7 +108,6 @@ export const SettingsPage = ({
     </motion.button>
   );
 
-  // Settings Row Component
   const SettingsRow = ({ 
     icon: Icon, 
     label, 
@@ -142,7 +146,6 @@ export const SettingsPage = ({
     </motion.button>
   );
 
-  // Toggle Component
   const Toggle = ({ enabled, onChange }: { enabled: boolean; onChange: () => void }) => (
     <motion.button
       whileTap={{ scale: 0.95 }}
@@ -162,6 +165,18 @@ export const SettingsPage = ({
     );
   }
 
+  // Color Picker
+  if (showColorPicker) {
+    return (
+      <ColorPicker
+        currentColor={appSettings.accentColor}
+        onColorChange={(color) => onSettingsChange({ accentColor: color })}
+        onClose={() => setShowColorPicker(false)}
+        t={t}
+      />
+    );
+  }
+
   // Software Info View
   if (currentView === 'software') {
     return (
@@ -172,7 +187,6 @@ export const SettingsPage = ({
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.3 }}
         className="space-y-5"
-        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <BackButton title={t('software')} />
         
@@ -188,7 +202,7 @@ export const SettingsPage = ({
           </div>
           <div className="info-row border-b border-border/20">
             <span className="info-row-label">{t('versionLabel')}</span>
-            <span className="info-row-value">1.3.0 (Build 42)</span>
+            <span className="info-row-value">1.4.0 (Build 50)</span>
           </div>
           <div className="info-row border-b border-border/20">
             <span className="info-row-label">{t('developmentTeam')}</span>
@@ -213,7 +227,6 @@ export const SettingsPage = ({
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.3 }}
         className="space-y-5"
-        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <BackButton title={t('appearance')} />
         <h1 className="text-xl font-bold text-foreground">{t('appearance')}</h1>
@@ -247,32 +260,6 @@ export const SettingsPage = ({
           </div>
         </GlassCard>
 
-        {/* Glass Intensity */}
-        <GlassCard className="!p-0 overflow-hidden">
-          <div className="settings-group-header">
-            <span className="settings-group-title">{t('glassIntensity')}</span>
-          </div>
-          <div className="p-4">
-            <div className="flex gap-2">
-              {(['light', 'medium', 'strong'] as const).map((intensity) => (
-                <motion.button
-                  key={intensity}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setGlassIntensity(intensity)}
-                  className={cn(
-                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all",
-                    glassIntensity === intensity
-                      ? 'bg-primary text-primary-foreground shadow-lg'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                  )}
-                >
-                  {t(intensity)}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </GlassCard>
-
         {/* Font Size */}
         <GlassCard className="!p-0 overflow-hidden">
           <div className="settings-group-header">
@@ -286,51 +273,205 @@ export const SettingsPage = ({
                   whileTap={{ scale: 0.95 }}
                   onClick={() => onFontSizeChange(size)}
                   className={cn(
-                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all",
+                    "flex-1 py-3 rounded-xl font-medium transition-all",
                     fontSize === size
+                      ? 'bg-primary text-primary-foreground shadow-lg'
+                      : 'bg-muted/50 text-muted-foreground hover:bg-muted',
+                    size === 'small' && 'text-xs',
+                    size === 'medium' && 'text-sm',
+                    size === 'large' && 'text-base'
+                  )}
+                >
+                  {t(size === 'medium' ? 'mediumSize' : size)}
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        </GlassCard>
+      </motion.div>
+    );
+  }
+
+  // Customization View
+  if (currentView === 'customization') {
+    return (
+      <motion.div
+        key="customization"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -20 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-5"
+      >
+        <BackButton title={t('customization')} />
+        <h1 className="text-xl font-bold text-foreground">{t('customization')}</h1>
+
+        {/* Layout & View */}
+        <GlassCard className="!p-0 overflow-hidden">
+          <div className="settings-group-header">
+            <span className="settings-group-title">{t('layoutView')}</span>
+          </div>
+          <div className="p-4 space-y-4">
+            <p className="text-xs text-muted-foreground mb-2">{t('taskViewMode')}</p>
+            <div className="flex gap-2">
+              {(['compact', 'standard', 'cards'] as TaskViewMode[]).map((mode) => (
+                <motion.button
+                  key={mode}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => onSettingsChange({ taskViewMode: mode })}
+                  className={cn(
+                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all flex flex-col items-center gap-1",
+                    appSettings.taskViewMode === mode
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  {size === 'small' ? 'A' : size === 'medium' ? 'A' : 'A'}
-                  <span className={cn(
-                    "ml-1",
-                    size === 'small' && 'text-xs',
-                    size === 'medium' && 'text-sm',
-                    size === 'large' && 'text-base'
-                  )}>
-                    {t(size === 'medium' ? 'mediumSize' : size)}
-                  </span>
+                  {mode === 'compact' && <LayoutList className="w-4 h-4" />}
+                  {mode === 'standard' && <LayoutList className="w-4 h-4" />}
+                  {mode === 'cards' && <LayoutGrid className="w-4 h-4" />}
+                  <span className="text-xs">{t(mode)}</span>
                 </motion.button>
               ))}
             </div>
           </div>
         </GlassCard>
 
-        {/* Animations */}
+        {/* Size & Density */}
         <GlassCard className="!p-0 overflow-hidden">
           <div className="settings-group-header">
-            <span className="settings-group-title">{t('animations')}</span>
+            <span className="settings-group-title">{t('sizeDensity')}</span>
+          </div>
+          <div className="p-4 space-y-4">
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">{t('textSize')}</p>
+              <div className="flex gap-2">
+                {(['small', 'normal', 'large'] as TextSize[]).map((size) => (
+                  <motion.button
+                    key={size}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onSettingsChange({ textSize: size })}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl font-medium transition-all",
+                      appSettings.textSize === size
+                        ? 'bg-primary text-primary-foreground shadow-lg'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted',
+                      size === 'small' && 'text-xs',
+                      size === 'normal' && 'text-sm',
+                      size === 'large' && 'text-base'
+                    )}
+                  >
+                    A
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">{t('uiDensity')}</p>
+              <div className="flex gap-2">
+                {(['compact', 'normal'] as UIDensity[]).map((density) => (
+                  <motion.button
+                    key={density}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => onSettingsChange({ uiDensity: density })}
+                    className={cn(
+                      "flex-1 py-2.5 rounded-xl text-sm font-medium transition-all",
+                      appSettings.uiDensity === density
+                        ? 'bg-primary text-primary-foreground shadow-lg'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                    )}
+                  >
+                    {t(density)}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* Colors & Accents */}
+        <GlassCard className="!p-0 overflow-hidden">
+          <div className="settings-group-header">
+            <span className="settings-group-title">{t('colorsAccents')}</span>
+          </div>
+          <SettingsRow 
+            icon={Palette} 
+            label={t('accentColor')} 
+            onClick={() => setShowColorPicker(true)}
+          >
+            <div 
+              className="w-6 h-6 rounded-full border-2 border-border"
+              style={{ backgroundColor: appSettings.accentColor }}
+            />
+          </SettingsRow>
+        </GlassCard>
+
+        {/* Glass Intensity */}
+        <GlassCard className="!p-0 overflow-hidden">
+          <div className="settings-group-header">
+            <span className="settings-group-title">{t('glassIntensity')}</span>
           </div>
           <div className="p-4">
             <div className="flex gap-2">
-              {(['full', 'reduced', 'off'] as const).map((anim) => (
+              {(['light', 'normal', 'strong'] as GlassIntensity[]).map((intensity) => (
                 <motion.button
-                  key={anim}
+                  key={intensity}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setAnimationsEnabled(anim)}
+                  onClick={() => onSettingsChange({ glassIntensity: intensity })}
                   className={cn(
-                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all",
-                    animationsEnabled === anim
+                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2",
+                    appSettings.glassIntensity === intensity
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  {t(anim)}
+                  <Droplets className={cn(
+                    "w-4 h-4",
+                    intensity === 'light' && 'opacity-40',
+                    intensity === 'normal' && 'opacity-70',
+                    intensity === 'strong' && 'opacity-100'
+                  )} />
+                  {t(intensity)}
                 </motion.button>
               ))}
             </div>
           </div>
+        </GlassCard>
+
+        {/* Reset Options */}
+        <GlassCard className="!p-0 overflow-hidden">
+          <div className="settings-group-header">
+            <span className="settings-group-title">{t('resetOptions')}</span>
+          </div>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onResetSettings('colors')}
+            className="w-full settings-row settings-row-clickable"
+          >
+            <div className="flex items-center gap-3">
+              <Palette className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm text-foreground">{t('resetColors')}</span>
+            </div>
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onResetSettings('layout')}
+            className="w-full settings-row settings-row-clickable"
+          >
+            <div className="flex items-center gap-3">
+              <LayoutGrid className="w-5 h-5 text-muted-foreground" />
+              <span className="text-sm text-foreground">{t('resetLayout')}</span>
+            </div>
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onResetSettings('all')}
+            className="w-full settings-row settings-row-clickable"
+          >
+            <div className="flex items-center gap-3">
+              <RefreshCw className="w-5 h-5 text-destructive" />
+              <span className="text-sm text-destructive font-medium">{t('resetAll')}</span>
+            </div>
+          </motion.button>
         </GlassCard>
       </motion.div>
     );
@@ -346,7 +487,6 @@ export const SettingsPage = ({
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.3 }}
         className="space-y-5"
-        dir={isRTL ? 'rtl' : 'ltr'}
       >
         <BackButton title={t('privacyData')} />
         <h1 className="text-xl font-bold text-foreground">{t('privacyData')}</h1>
@@ -399,7 +539,6 @@ export const SettingsPage = ({
       exit={{ opacity: 0, x: 20 }}
       variants={containerVariants}
       className="space-y-5"
-      dir={isRTL ? 'rtl' : 'ltr'}
     >
       <motion.h1 variants={itemVariants} className="text-2xl font-bold text-foreground">
         {t('settings')}
@@ -421,6 +560,11 @@ export const SettingsPage = ({
             value={currentLanguageInfo?.nativeName}
             onClick={() => setCurrentView('language')} 
           />
+          <SettingsRow 
+            icon={Sliders} 
+            label={t('customization')} 
+            onClick={() => setCurrentView('customization')} 
+          />
         </GlassCard>
       </motion.div>
 
@@ -429,9 +573,9 @@ export const SettingsPage = ({
         <p className="section-header">{t('notifications')}</p>
         <GlassCard className="!p-0 overflow-hidden">
           <div className="settings-row">
-            <div className={cn("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+            <div className="flex items-center gap-3">
               <Bell className="w-5 h-5 text-primary" />
-              <div className={cn(isRTL ? "text-right" : "text-left")}>
+              <div>
                 <span className="text-sm text-foreground block">{t('pushNotifications')}</span>
                 <span className="text-xs text-muted-foreground">{t('dailyReminders')}</span>
               </div>
@@ -446,7 +590,7 @@ export const SettingsPage = ({
         <p className="section-header">{t('calendarReminders')}</p>
         <GlassCard className="!p-0 overflow-hidden">
           <div className="p-4">
-            <div className={cn("flex items-center gap-3 mb-3", isRTL && "flex-row-reverse")}>
+            <div className="flex items-center gap-3 mb-3">
               <Clock className="w-5 h-5 text-primary" />
               <span className="text-sm text-foreground">{t('defaultReminder')}</span>
             </div>
@@ -514,7 +658,7 @@ export const SettingsPage = ({
           <SettingsRow 
             icon={Smartphone} 
             label={t('software')} 
-            value="1.3.0"
+            value="1.4.0"
             onClick={() => setCurrentView('software')} 
           />
         </GlassCard>
