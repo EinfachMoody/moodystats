@@ -8,9 +8,7 @@ import {
   TrendingUp,
   Calendar,
   Filter,
-  Search,
-  LayoutGrid,
-  FolderPlus
+  Search
 } from 'lucide-react';
 import { format, Locale } from 'date-fns';
 import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
@@ -27,10 +25,7 @@ import { SettingsPage } from '@/components/SettingsPage';
 import { CalendarView } from '@/components/CalendarView';
 import { StatsPage } from '@/components/StatsPage';
 import { UndoToast } from '@/components/UndoToast';
-import { FocusTasks } from '@/components/FocusTasks';
-import { PageManager } from '@/components/PageManager';
-import { TaskDetailSheet } from '@/components/TaskDetailSheet';
-import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS, TaskPage, AppSettings, DEFAULT_SETTINGS } from '@/types';
+import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS } from '@/types';
 import { Language } from '@/i18n/translations';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -47,8 +42,6 @@ const Index = () => {
   const [journalEntries, setJournalEntries] = useLocalStorage<JournalEntry[]>('dailyflow-journal', []);
   const [totalPoints, setTotalPoints] = useLocalStorage<number>('dailyflow-points', 0);
   const [streak, setStreak] = useLocalStorage<number>('dailyflow-streak', 0);
-  const [taskPages, setTaskPages] = useLocalStorage<TaskPage[]>('dailyflow-pages', []);
-  const [appSettings, setAppSettings] = useLocalStorage<AppSettings>('dailyflow-settings', DEFAULT_SETTINGS);
   
   // Settings with localStorage
   const [language, setLanguage] = useLocalStorage<Language>('dailyflow-language', 'en');
@@ -69,10 +62,6 @@ const Index = () => {
   const [deletedTask, setDeletedTask] = useState<Task | null>(null);
   const [showUndoToast, setShowUndoToast] = useState(false);
   const [isAddingTask, setIsAddingTask] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [showTaskDetail, setShowTaskDetail] = useState(false);
-  const [showPageManager, setShowPageManager] = useState(false);
-  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
 
   const { t, isRTL } = useTranslation(language);
   const dateLocale = dateLocales[language] || enUS;
@@ -101,36 +90,6 @@ const Index = () => {
     document.documentElement.style.fontSize = sizes[fontSize];
   }, [fontSize]);
 
-  // Apply glass intensity
-  useEffect(() => {
-    const intensities = { light: '0.6', normal: '1', strong: '1.4' };
-    document.documentElement.style.setProperty('--glass-intensity', intensities[appSettings.glassIntensity]);
-  }, [appSettings.glassIntensity]);
-
-  // Apply accent color
-  useEffect(() => {
-    if (appSettings.accentColor) {
-      // Convert hex to HSL for CSS variable
-      const hex = appSettings.accentColor.replace('#', '');
-      const r = parseInt(hex.substr(0, 2), 16) / 255;
-      const g = parseInt(hex.substr(2, 2), 16) / 255;
-      const b = parseInt(hex.substr(4, 2), 16) / 255;
-      const max = Math.max(r, g, b);
-      const min = Math.min(r, g, b);
-      let h = 0, s = 0, l = (max + min) / 2;
-      if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-          case g: h = ((b - r) / d + 2) / 6; break;
-          case b: h = ((r - g) / d + 4) / 6; break;
-        }
-      }
-      document.documentElement.style.setProperty('--primary', `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`);
-    }
-  }, [appSettings.accentColor]);
-
   // Check for today's mood
   useEffect(() => {
     const today = format(new Date(), 'yyyy-MM-dd');
@@ -144,13 +103,10 @@ const Index = () => {
   const todayTasks = tasks.filter(t => 
     format(new Date(t.dueDate), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
   );
-  const focusTasks = tasks.filter(t => t.isFocus && !t.completed);
 
-  const filteredTasks = selectedPageId 
-    ? tasks.filter(t => t.pageId === selectedPageId)
-    : filterCategory === 'all' 
-      ? tasks 
-      : tasks.filter(t => t.category === filterCategory);
+  const filteredTasks = filterCategory === 'all' 
+    ? tasks 
+    : tasks.filter(t => t.category === filterCategory);
 
   const handleCompleteTask = useCallback((id: string) => {
     setTasks(prev => prev.map(task => {
@@ -175,6 +131,7 @@ const Index = () => {
       setShowUndoToast(true);
       setTasks(prev => prev.filter(t => t.id !== id));
       
+      // Auto-dismiss after 5 seconds
       setTimeout(() => {
         setShowUndoToast(false);
         setDeletedTask(null);
@@ -191,6 +148,7 @@ const Index = () => {
   }, [deletedTask, setTasks]);
 
   const handleAddTask = useCallback((task: Omit<Task, 'id' | 'completed' | 'completedAt'>) => {
+    // Prevent double-tap duplicate entries
     if (isAddingTask) return;
     setIsAddingTask(true);
     
@@ -198,33 +156,12 @@ const Index = () => {
       ...task,
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       completed: false,
-      order: tasks.length,
-      pageId: selectedPageId || undefined,
     };
     setTasks(prev => [newTask, ...prev]);
     
+    // Reset after short delay
     setTimeout(() => setIsAddingTask(false), 500);
-  }, [setTasks, isAddingTask, tasks.length, selectedPageId]);
-
-  const handleUpdateTask = useCallback((updatedTask: Task) => {
-    setTasks(prev => prev.map(t => t.id === updatedTask.id ? updatedTask : t));
-    setShowTaskDetail(false);
-    setSelectedTask(null);
-  }, [setTasks]);
-
-  const handleToggleFocus = useCallback((taskId: string) => {
-    const currentFocusCount = tasks.filter(t => t.isFocus && !t.completed).length;
-    setTasks(prev => prev.map(t => {
-      if (t.id === taskId) {
-        if (t.isFocus) {
-          return { ...t, isFocus: false };
-        } else if (currentFocusCount < 3) {
-          return { ...t, isFocus: true };
-        }
-      }
-      return t;
-    }));
-  }, [tasks, setTasks]);
+  }, [setTasks, isAddingTask]);
 
   const handleMoodSelect = useCallback((mood: MoodType) => {
     setTodayMood(mood);
@@ -251,49 +188,6 @@ const Index = () => {
     setJournalEntries(prev => [newEntry, ...prev]);
     setJournalText('');
   }, [journalText, setJournalEntries]);
-
-  const handleAddPage = useCallback((page: Omit<TaskPage, 'id' | 'order' | 'createdAt'>) => {
-    const newPage: TaskPage = {
-      ...page,
-      id: `page-${Date.now()}`,
-      order: taskPages.length,
-      createdAt: new Date(),
-    };
-    setTaskPages(prev => [...prev, newPage]);
-  }, [taskPages, setTaskPages]);
-
-  const handleUpdatePage = useCallback((updatedPage: TaskPage) => {
-    setTaskPages(prev => prev.map(p => p.id === updatedPage.id ? updatedPage : p));
-  }, [setTaskPages]);
-
-  const handleDeletePage = useCallback((pageId: string) => {
-    setTaskPages(prev => prev.filter(p => p.id !== pageId));
-    setTasks(prev => prev.map(t => t.pageId === pageId ? { ...t, pageId: undefined } : t));
-    if (selectedPageId === pageId) setSelectedPageId(null);
-  }, [setTaskPages, setTasks, selectedPageId]);
-
-  const handleSettingsChange = useCallback((newSettings: Partial<AppSettings>) => {
-    setAppSettings(prev => ({ ...prev, ...newSettings }));
-  }, [setAppSettings]);
-
-  const handleResetSettings = useCallback((type: 'colors' | 'layout' | 'all') => {
-    if (type === 'all') {
-      setAppSettings(DEFAULT_SETTINGS);
-    } else if (type === 'colors') {
-      setAppSettings(prev => ({
-        ...prev,
-        accentColor: DEFAULT_SETTINGS.accentColor,
-        glassIntensity: DEFAULT_SETTINGS.glassIntensity,
-      }));
-    } else if (type === 'layout') {
-      setAppSettings(prev => ({
-        ...prev,
-        taskViewMode: DEFAULT_SETTINGS.taskViewMode,
-        textSize: DEFAULT_SETTINGS.textSize,
-        uiDensity: DEFAULT_SETTINGS.uiDensity,
-      }));
-    }
-  }, [setAppSettings]);
 
   const filteredJournalEntries = searchTags
     ? journalEntries.filter(e => 
@@ -348,27 +242,6 @@ const Index = () => {
         onAdd={handleAddTask}
         t={t}
         language={language}
-      />
-
-      {/* Task Detail Sheet */}
-      <TaskDetailSheet
-        task={selectedTask}
-        isOpen={showTaskDetail}
-        onClose={() => { setShowTaskDetail(false); setSelectedTask(null); }}
-        onSave={handleUpdateTask}
-        onDelete={(id) => { handleDeleteTask(id); setShowTaskDetail(false); setSelectedTask(null); }}
-        t={t}
-      />
-
-      {/* Page Manager Sheet */}
-      <PageManager
-        pages={taskPages}
-        isOpen={showPageManager}
-        onClose={() => setShowPageManager(false)}
-        onAddPage={handleAddPage}
-        onUpdatePage={handleUpdatePage}
-        onDeletePage={handleDeletePage}
-        t={t}
       />
 
       {/* Floating Action Button */}
@@ -426,16 +299,6 @@ const Index = () => {
                 />
               </div>
 
-              {/* Focus Tasks */}
-              {focusTasks.length > 0 && (
-                <FocusTasks
-                  tasks={focusTasks}
-                  onComplete={handleCompleteTask}
-                  onRemoveFocus={handleToggleFocus}
-                  t={t}
-                />
-              )}
-
               {/* Today's Mood */}
               <GlassCard className="!p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -487,8 +350,6 @@ const Index = () => {
                       index={index}
                       onComplete={handleCompleteTask}
                       onDelete={handleDeleteTask}
-                      onClick={() => { setSelectedTask(task); setShowTaskDetail(true); }}
-                      viewMode={appSettings.taskViewMode}
                     />
                   ))}
                   
@@ -534,84 +395,33 @@ const Index = () => {
             >
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold text-foreground">{t('tasks')}</h1>
-                <div className="flex gap-2">
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowPageManager(true)}
-                    className="p-2 rounded-xl bg-muted/50"
-                  >
-                    <FolderPlus className="w-4 h-4 text-muted-foreground" />
-                  </motion.button>
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}
-                    className="p-2 rounded-xl bg-muted/50"
-                  >
-                    <LayoutGrid className="w-4 h-4 text-muted-foreground" />
-                  </motion.button>
-                </div>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setViewMode(viewMode === 'list' ? 'card' : 'list')}
+                  className="p-2 rounded-xl bg-muted/50"
+                >
+                  <Filter className="w-4 h-4 text-muted-foreground" />
+                </motion.button>
               </div>
 
-              {/* Pages Pills */}
-              {taskPages.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+              {/* Filter Pills */}
+              <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
+                {['all', 'work', 'personal', 'health', 'other'].map((cat) => (
                   <motion.button
+                    key={cat}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedPageId(null)}
+                    onClick={() => setFilterCategory(cat)}
                     className={cn(
                       'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
-                      selectedPageId === null
+                      filterCategory === cat
                         ? 'bg-primary text-primary-foreground'
                         : 'bg-muted/50 text-muted-foreground'
                     )}
                   >
-                    {t('all')}
+                    {getCategoryLabel(cat)}
                   </motion.button>
-                  {taskPages.map((page) => (
-                    <motion.button
-                      key={page.id}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedPageId(page.id)}
-                      className={cn(
-                        'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2',
-                        selectedPageId === page.id
-                          ? 'text-white'
-                          : 'bg-muted/50 text-muted-foreground'
-                      )}
-                      style={{
-                        backgroundColor: selectedPageId === page.id ? page.accentColor : undefined,
-                      }}
-                    >
-                      <span 
-                        className="w-2 h-2 rounded-full"
-                        style={{ backgroundColor: page.accentColor }}
-                      />
-                      {page.name}
-                    </motion.button>
-                  ))}
-                </div>
-              )}
-
-              {/* Filter Pills */}
-              {!selectedPageId && (
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-                  {['all', 'work', 'personal', 'health', 'other'].map((cat) => (
-                    <motion.button
-                      key={cat}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setFilterCategory(cat)}
-                      className={cn(
-                        'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
-                        filterCategory === cat
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted/50 text-muted-foreground'
-                      )}
-                    >
-                      {getCategoryLabel(cat)}
-                    </motion.button>
-                  ))}
-                </div>
-              )}
+                ))}
+              </div>
 
               {/* Pending Tasks */}
               {filteredTasks.filter(t => !t.completed).length > 0 && (
@@ -627,8 +437,6 @@ const Index = () => {
                         index={index}
                         onComplete={handleCompleteTask}
                         onDelete={handleDeleteTask}
-                        onClick={() => { setSelectedTask(task); setShowTaskDetail(true); }}
-                        viewMode={appSettings.taskViewMode}
                       />
                     ))}
                   </div>
@@ -649,8 +457,6 @@ const Index = () => {
                         index={index}
                         onComplete={handleCompleteTask}
                         onDelete={handleDeleteTask}
-                        onClick={() => { setSelectedTask(task); setShowTaskDetail(true); }}
-                        viewMode={appSettings.taskViewMode}
                       />
                     ))}
                   </div>
@@ -678,7 +484,7 @@ const Index = () => {
               language={language}
               t={t}
               onAddTask={() => setIsAddTaskOpen(true)}
-              onSelectTask={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
+              onSelectTask={(task) => handleCompleteTask(task.id)}
             />
           )}
 
@@ -838,9 +644,6 @@ const Index = () => {
               onLanguageChange={setLanguage}
               defaultReminder={defaultReminder}
               onDefaultReminderChange={setDefaultReminder}
-              appSettings={appSettings}
-              onSettingsChange={handleSettingsChange}
-              onResetSettings={handleResetSettings}
               stats={{
                 totalPoints,
                 streak,
