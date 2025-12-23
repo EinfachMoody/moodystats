@@ -169,9 +169,11 @@ export const SettingsPage = ({
   if (showColorPicker) {
     return (
       <ColorPicker
+        isOpen={showColorPicker}
         currentColor={appSettings.accentColor}
         onColorChange={(color) => onSettingsChange({ accentColor: color })}
         onClose={() => setShowColorPicker(false)}
+        onReset={() => onSettingsChange({ accentColor: '#3B82F6' })}
         t={t}
       />
     );

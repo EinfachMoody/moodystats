@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
-import { Check, Clock, Trash2, ChevronRight } from 'lucide-react';
-import { Task, CATEGORY_LABELS } from '@/types';
+import { Check, Clock, Trash2, Star, CheckSquare } from 'lucide-react';
+import { Task, CATEGORY_LABELS, TaskViewMode } from '@/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -9,7 +9,9 @@ interface TaskCardProps {
   task: Task;
   onComplete: (id: string) => void;
   onDelete: (id: string) => void;
+  onClick?: () => void;
   index?: number;
+  viewMode?: TaskViewMode;
 }
 
 const priorityColors = {
@@ -25,7 +27,7 @@ const categoryStyles = {
   other: 'category-other',
 };
 
-export const TaskCard = ({ task, onComplete, onDelete, index = 0 }: TaskCardProps) => {
+export const TaskCard = ({ task, onComplete, onDelete, onClick, index = 0, viewMode = 'standard' }: TaskCardProps) => {
   const [dragX, setDragX] = useState(0);
 
   const handleDragEnd = (e: any, info: PanInfo) => {
@@ -36,6 +38,9 @@ export const TaskCard = ({ task, onComplete, onDelete, index = 0 }: TaskCardProp
     }
     setDragX(0);
   };
+
+  const completedSubtasks = task.subtasks?.filter(st => st.completed).length || 0;
+  const totalSubtasks = task.subtasks?.length || 0;
 
   return (
     <AnimatePresence mode="popLayout">
@@ -54,10 +59,14 @@ export const TaskCard = ({ task, onComplete, onDelete, index = 0 }: TaskCardProp
         dragElastic={0.2}
         onDrag={(e, info) => setDragX(info.offset.x)}
         onDragEnd={handleDragEnd}
+        onClick={onClick}
         className={cn(
-          'glass-card p-3.5 border-l-[3px] group cursor-grab active:cursor-grabbing',
+          'glass-card border-l-[3px] group cursor-grab active:cursor-grabbing',
           priorityColors[task.priority],
-          task.completed && 'opacity-60'
+          task.completed && 'opacity-60',
+          viewMode === 'compact' && 'p-2.5',
+          viewMode === 'standard' && 'p-3.5',
+          viewMode === 'cards' && 'p-4'
         )}
         style={{
           backgroundColor: dragX > 50 
@@ -67,14 +76,15 @@ export const TaskCard = ({ task, onComplete, onDelete, index = 0 }: TaskCardProp
             : undefined
         }}
       >
-        <div className="flex items-start gap-3">
+        <div className={cn("flex items-start", viewMode === 'compact' ? 'gap-2' : 'gap-3')}>
           {/* Completion Button */}
           <motion.button
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.9 }}
             onClick={(e) => { e.stopPropagation(); onComplete(task.id); }}
             className={cn(
-              'flex-shrink-0 w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center transition-all duration-300 mt-0.5',
+              'flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all duration-300 mt-0.5',
+              viewMode === 'compact' ? 'w-5 h-5' : 'w-[22px] h-[22px]',
               task.completed
                 ? 'bg-accent border-accent text-white'
                 : 'border-muted-foreground/25 hover:border-accent hover:bg-accent/10'
@@ -93,31 +103,48 @@ export const TaskCard = ({ task, onComplete, onDelete, index = 0 }: TaskCardProp
 
           {/* Task Content */}
           <div className="flex-1 min-w-0">
-            <h4 className={cn(
-              'font-medium text-foreground text-sm transition-all duration-300 leading-snug',
-              task.completed && 'line-through text-muted-foreground'
-            )}>
-              {task.title}
-            </h4>
+            <div className="flex items-center gap-2">
+              <h4 className={cn(
+                'font-medium text-foreground transition-all duration-300 leading-snug',
+                viewMode === 'compact' ? 'text-xs' : 'text-sm',
+                task.completed && 'line-through text-muted-foreground'
+              )}>
+                {task.title}
+              </h4>
+              {task.marked && (
+                <Star className="w-3 h-3 text-primary fill-primary flex-shrink-0" />
+              )}
+            </div>
             
-            {task.description && (
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2 leading-relaxed">
+            {task.description && viewMode !== 'compact' && (
+              <p className={cn(
+                "text-muted-foreground mt-1 leading-relaxed",
+                viewMode === 'cards' ? 'text-sm line-clamp-3' : 'text-xs line-clamp-2'
+              )}>
                 {task.description}
               </p>
             )}
 
-            <div className="flex items-center gap-2 mt-2.5 flex-wrap">
+            <div className={cn("flex items-center gap-2 flex-wrap", viewMode === 'compact' ? 'mt-1.5' : 'mt-2.5')}>
               <span className={cn(
-                'text-[10px] px-2 py-0.5 rounded-full font-medium',
+                'px-2 py-0.5 rounded-full font-medium',
+                viewMode === 'compact' ? 'text-[9px]' : 'text-[10px]',
                 categoryStyles[task.category]
               )}>
                 {CATEGORY_LABELS[task.category]}
               </span>
               
-              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+              <span className={cn("text-muted-foreground flex items-center gap-1", viewMode === 'compact' ? 'text-[9px]' : 'text-[10px]')}>
                 <Clock className="w-3 h-3" />
                 {format(task.dueDate, 'MMM d')}
               </span>
+
+              {totalSubtasks > 0 && (
+                <span className={cn("text-muted-foreground flex items-center gap-1", viewMode === 'compact' ? 'text-[9px]' : 'text-[10px]')}>
+                  <CheckSquare className="w-3 h-3" />
+                  {completedSubtasks}/{totalSubtasks}
+                </span>
+              )}
 
               {!task.completed && (
                 <span className="text-[10px] font-semibold text-primary ml-auto">

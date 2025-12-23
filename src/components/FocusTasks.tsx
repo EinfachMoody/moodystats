@@ -6,22 +6,19 @@ import { format } from 'date-fns';
 
 interface FocusTasksProps {
   tasks: Task[];
-  focusTasks: Task[];
-  onToggleFocus: (taskId: string) => void;
   onComplete: (taskId: string) => void;
+  onRemoveFocus: (taskId: string) => void;
   t: (key: string) => string;
 }
 
 export const FocusTasks = ({
   tasks,
-  focusTasks,
-  onToggleFocus,
   onComplete,
+  onRemoveFocus,
   t,
 }: FocusTasksProps) => {
-  const availableTasks = tasks.filter(t => !t.completed && !t.isFocus);
+  const focusTasks = tasks.filter(task => task.isFocus && !task.completed);
   const maxFocus = 3;
-  const canAddMore = focusTasks.length < maxFocus;
 
   return (
     <div className="space-y-4">
@@ -92,7 +89,7 @@ export const FocusTasks = ({
                   {/* Remove from Focus */}
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={() => onToggleFocus(task.id)}
+                    onClick={() => onRemoveFocus(task.id)}
                     className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   >
                     <X className="w-4 h-4" />
@@ -116,26 +113,6 @@ export const FocusTasks = ({
         )}
       </AnimatePresence>
 
-      {/* Add to Focus */}
-      {canAddMore && availableTasks.length > 0 && (
-        <div>
-          <p className="text-xs text-muted-foreground mb-2">{t('addToFocus')}</p>
-          <div className="space-y-1.5">
-            {availableTasks.slice(0, 5).map((task) => (
-              <motion.button
-                key={task.id}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => onToggleFocus(task.id)}
-                className="w-full p-3 rounded-xl bg-muted/30 hover:bg-muted/50 flex items-center gap-3 transition-all text-left"
-              >
-                <Star className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm flex-1 truncate">{task.title}</span>
-                <span className="text-xs text-primary font-medium">+{task.points}</span>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
