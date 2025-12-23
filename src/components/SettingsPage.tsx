@@ -204,7 +204,11 @@ export const SettingsPage = ({
           </div>
           <div className="info-row border-b border-border/20">
             <span className="info-row-label">{t('versionLabel')}</span>
-            <span className="info-row-value">1.4.0 (Build 50)</span>
+            <span className="info-row-value">0.2 Alpha 4</span>
+          </div>
+          <div className="info-row border-b border-border/20">
+            <span className="info-row-label">{t('buildLabel')}</span>
+            <span className="info-row-value">54</span>
           </div>
           <div className="info-row border-b border-border/20">
             <span className="info-row-label">{t('developmentTeam')}</span>
@@ -407,32 +411,26 @@ export const SettingsPage = ({
           </SettingsRow>
         </GlassCard>
 
-        {/* Glass Intensity */}
+        {/* Navigation Position */}
         <GlassCard className="!p-0 overflow-hidden">
           <div className="settings-group-header">
-            <span className="settings-group-title">{t('glassIntensity')}</span>
+            <span className="settings-group-title">{t('navPosition')}</span>
           </div>
           <div className="p-4">
-            <div className="flex gap-2">
-              {(['light', 'normal', 'strong'] as GlassIntensity[]).map((intensity) => (
+            <div className="grid grid-cols-2 gap-2">
+              {(['bottom', 'top', 'left', 'right'] as const).map((pos) => (
                 <motion.button
-                  key={intensity}
+                  key={pos}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => onSettingsChange({ glassIntensity: intensity })}
+                  onClick={() => onSettingsChange({ navPosition: pos })}
                   className={cn(
-                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2",
-                    appSettings.glassIntensity === intensity
+                    "py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2",
+                    appSettings.navPosition === pos
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  <Droplets className={cn(
-                    "w-4 h-4",
-                    intensity === 'light' && 'opacity-40',
-                    intensity === 'normal' && 'opacity-70',
-                    intensity === 'strong' && 'opacity-100'
-                  )} />
-                  {t(intensity)}
+                  {t(pos)}
                 </motion.button>
               ))}
             </div>

@@ -14,6 +14,12 @@ export type UIDensity = 'compact' | 'normal';
 
 export type GlassIntensity = 'light' | 'normal' | 'strong';
 
+export type NavPosition = 'bottom' | 'top' | 'left' | 'right';
+
+// App version info
+export const APP_VERSION = '0.2 Alpha 4';
+export const APP_BUILD = '54';
+
 // Custom Page/Category for Tasks
 export interface TaskPage {
   id: string;
@@ -133,6 +139,8 @@ export interface AppSettings {
   glassIntensity: GlassIntensity;
   // Theme
   themeMode: 'light' | 'dark' | 'system';
+  // Navigation
+  navPosition: NavPosition;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -142,4 +150,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   accentColor: '#3B82F6',
   glassIntensity: 'normal',
   themeMode: 'system',
+  navPosition: 'bottom',
 };
