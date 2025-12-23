@@ -14,8 +14,8 @@ import { cn } from '@/lib/utils';
 
 interface PageManagerProps {
   pages: TaskPage[];
-  selectedPageId: string | null;
-  onSelectPage: (id: string | null) => void;
+  isOpen: boolean;
+  onClose: () => void;
   onAddPage: (page: Omit<TaskPage, 'id' | 'createdAt' | 'order'>) => void;
   onUpdatePage: (page: TaskPage) => void;
   onDeletePage: (id: string) => void;
@@ -24,8 +24,8 @@ interface PageManagerProps {
 
 export const PageManager = ({
   pages,
-  selectedPageId,
-  onSelectPage,
+  isOpen,
+  onClose,
   onAddPage,
   onUpdatePage,
   onDeletePage,
@@ -68,27 +68,36 @@ export const PageManager = ({
     setEditingId(null);
   };
 
-  return (
-    <div className="space-y-3">
-      {/* All Tasks Button */}
-      <motion.button
-        whileTap={{ scale: 0.98 }}
-        onClick={() => onSelectPage(null)}
-        className={cn(
-          "w-full p-3.5 rounded-2xl flex items-center gap-3 transition-all",
-          selectedPageId === null
-            ? "bg-primary text-primary-foreground shadow-lg"
-            : "glass-card"
-        )}
-      >
-        <Folder className="w-5 h-5" />
-        <span className="font-medium flex-1 text-left">{t('allTasks')}</span>
-        <ChevronRight className={cn(
-          "w-4 h-4 transition-transform",
-          selectedPageId === null && "rotate-90"
-        )} />
-      </motion.button>
+  if (!isOpen) return null;
 
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
+      />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 max-w-md mx-auto"
+      >
+        <div className="glass-card p-5 rounded-3xl max-h-[80vh] overflow-y-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-foreground">{t('pages')}</h3>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={onClose}
+              className="p-2 rounded-xl bg-muted/50"
+            >
+              <X className="w-5 h-5 text-muted-foreground" />
+            </motion.button>
+          </div>
+          
+          <div className="space-y-3">
       {/* Custom Pages */}
       <AnimatePresence mode="popLayout">
         {pages.map((page) => (
@@ -101,7 +110,7 @@ export const PageManager = ({
             className="relative"
           >
             {editingId === page.id ? (
-              <div className="glass-card p-3 space-y-3">
+              <div className="bg-muted/30 p-3 rounded-xl space-y-3">
                 <input
                   type="text"
                   value={editName}
@@ -142,49 +151,31 @@ export const PageManager = ({
                 </div>
               </div>
             ) : (
-              <motion.button
-                whileTap={{ scale: 0.98 }}
-                onClick={() => onSelectPage(page.id)}
-                className={cn(
-                  "w-full p-3.5 rounded-2xl flex items-center gap-3 transition-all group",
-                  selectedPageId === page.id
-                    ? "text-white shadow-lg"
-                    : "glass-card"
-                )}
-                style={{
-                  backgroundColor: selectedPageId === page.id ? page.accentColor : undefined,
-                }}
+              <div
+                className="w-full p-3.5 rounded-2xl flex items-center gap-3 transition-all group glass-card"
               >
                 <div 
                   className="w-3 h-3 rounded-full"
-                  style={{ 
-                    backgroundColor: selectedPageId === page.id ? 'white' : page.accentColor 
-                  }}
+                  style={{ backgroundColor: page.accentColor }}
                 />
                 <span className="font-medium flex-1 text-left">{page.name}</span>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1">
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStartEdit(page);
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-white/20"
+                    onClick={() => handleStartEdit(page)}
+                    className="p-1.5 rounded-lg hover:bg-muted/50"
                   >
-                    <Edit3 className="w-3.5 h-3.5" />
+                    <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
                   </motion.button>
                   <motion.button
                     whileTap={{ scale: 0.9 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeletePage(page.id);
-                    }}
-                    className="p-1.5 rounded-lg hover:bg-white/20 text-destructive"
+                    onClick={() => onDeletePage(page.id)}
+                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-destructive"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </motion.button>
                 </div>
-              </motion.button>
+              </div>
             )}
           </motion.div>
         ))}
@@ -197,7 +188,7 @@ export const PageManager = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="glass-card p-3 space-y-3 overflow-hidden"
+            className="bg-muted/30 p-3 rounded-xl space-y-3 overflow-hidden"
           >
             <input
               type="text"
@@ -246,13 +237,16 @@ export const PageManager = ({
           <motion.button
             whileTap={{ scale: 0.98 }}
             onClick={() => setIsAdding(true)}
-            className="w-full p-3.5 rounded-2xl glass-card flex items-center gap-3 text-primary"
+            className="w-full p-3.5 rounded-2xl bg-muted/30 hover:bg-muted/50 flex items-center gap-3 text-primary transition-colors"
           >
             <Plus className="w-5 h-5" />
             <span className="font-medium">{t('addPage')}</span>
           </motion.button>
         )}
       </AnimatePresence>
-    </div>
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };

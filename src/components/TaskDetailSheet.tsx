@@ -16,10 +16,10 @@ import { Task, Subtask, CATEGORY_LABELS } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface TaskDetailSheetProps {
-  task: Task;
+  task: Task | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (task: Task) => void;
+  onSave: (task: Task) => void;
   onDelete: (id: string) => void;
   t: (key: string) => string;
 }
@@ -28,19 +28,20 @@ export const TaskDetailSheet = ({
   task,
   isOpen,
   onClose,
-  onUpdate,
+  onSave,
   onDelete,
   t,
 }: TaskDetailSheetProps) => {
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description || '');
-  const [notes, setNotes] = useState(task.notes || '');
-  const [subtasks, setSubtasks] = useState<Subtask[]>(task.subtasks || []);
+  const [title, setTitle] = useState(task?.title || '');
+  const [description, setDescription] = useState(task?.description || '');
+  const [notes, setNotes] = useState(task?.notes || '');
+  const [subtasks, setSubtasks] = useState<Subtask[]>(task?.subtasks || []);
   const [newSubtask, setNewSubtask] = useState('');
-  const [isMarked, setIsMarked] = useState(task.marked || false);
+  const [isMarked, setIsMarked] = useState(task?.marked || false);
 
   const handleSave = () => {
-    onUpdate({
+    if (!task) return;
+    onSave({
       ...task,
       title,
       description,
@@ -76,7 +77,7 @@ export const TaskDetailSheet = ({
 
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && task && (
         <>
           {/* Backdrop */}
           <motion.div
