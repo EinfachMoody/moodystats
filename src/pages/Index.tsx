@@ -16,7 +16,7 @@ import { format, Locale } from 'date-fns';
 import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
 import { Navigation } from '@/components/Navigation';
 import { GlassCard } from '@/components/GlassCard';
-import { TaskCard } from '@/components/TaskCard';
+import { TaskCard, DraggableTaskList } from '@/components/TaskCard';
 import { MoodSelector } from '@/components/MoodSelector';
 import { MoodCard } from '@/components/MoodCard';
 import { StatsCard } from '@/components/StatsCard';
@@ -212,6 +212,26 @@ const Index = () => {
     setSelectedTask(null);
   }, [setTasks]);
 
+  const handleDuplicateTask = useCallback((task: Task) => {
+    const duplicatedTask: Task = {
+      ...task,
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      completed: false,
+      completedAt: undefined,
+      title: `${task.title} (copy)`,
+      order: tasks.length,
+    };
+    setTasks(prev => [duplicatedTask, ...prev]);
+  }, [tasks.length, setTasks]);
+
+  const handleReorderTasks = useCallback((reorderedTasks: Task[]) => {
+    setTasks(prev => {
+      const taskIds = new Set(reorderedTasks.map(t => t.id));
+      const otherTasks = prev.filter(t => !taskIds.has(t.id));
+      return [...reorderedTasks.map((t, i) => ({ ...t, order: i })), ...otherTasks];
+    });
+  }, [setTasks]);
+
   const handleToggleFocus = useCallback((taskId: string) => {
     const currentFocusCount = tasks.filter(t => t.isFocus && !t.completed).length;
     setTasks(prev => prev.map(t => {
@@ -392,6 +412,7 @@ const Index = () => {
         onClose={() => { setShowTaskDetail(false); setSelectedTask(null); }}
         onSave={handleUpdateTask}
         onDelete={(id) => { handleDeleteTask(id); setShowTaskDetail(false); setSelectedTask(null); }}
+        onDuplicate={handleDuplicateTask}
         t={t}
       />
 
@@ -658,19 +679,16 @@ const Index = () => {
                   <h3 className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">
                     {t('pending')} ({filteredTasks.filter(t => !t.completed).length})
                   </h3>
-                  <div className="space-y-2">
-                    {filteredTasks.filter(t => !t.completed).map((task, index) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        index={index}
-                        onComplete={handleCompleteTask}
-                        onDelete={handleDeleteTask}
-                        onClick={() => { setSelectedTask(task); setShowTaskDetail(true); }}
-                        viewMode={appSettings.taskViewMode}
-                      />
-                    ))}
-                  </div>
+                  <DraggableTaskList
+                    tasks={filteredTasks.filter(t => !t.completed)}
+                    onReorder={(reordered) => handleReorderTasks(reordered)}
+                    onComplete={handleCompleteTask}
+                    onDelete={handleDeleteTask}
+                    onClick={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
+                    onDuplicate={handleDuplicateTask}
+                    onToggleFocus={handleToggleFocus}
+                    viewMode={appSettings.taskViewMode}
+                  />
                 </div>
               )}
 
