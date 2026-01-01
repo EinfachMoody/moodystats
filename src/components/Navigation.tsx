@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
 import { Home, CheckSquare, Calendar, BarChart3, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NavPosition } from '@/types';
 
 interface NavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   t?: (key: string) => string;
   isRTL?: boolean;
+  position?: NavPosition;
 }
 
 const defaultLabels: Record<string, string> = {
@@ -25,40 +27,83 @@ const navItems = [
   { id: 'settings', icon: Settings },
 ];
 
-export const Navigation = ({ activeTab, onTabChange, t, isRTL = false }: NavigationProps) => {
+export const Navigation = ({ activeTab, onTabChange, t, isRTL = false, position = 'bottom' }: NavigationProps) => {
   const getLabel = (id: string) => {
     if (t) return t(id);
     return defaultLabels[id] || id;
   };
 
+  const isVertical = position === 'left' || position === 'right';
+
+  const getPositionClasses = () => {
+    switch (position) {
+      case 'top':
+        return 'top-0 left-0 right-0 pt-[env(safe-area-inset-top)]';
+      case 'left':
+        return 'left-0 top-0 bottom-0 pl-[env(safe-area-inset-left)] flex-col w-20';
+      case 'right':
+        return 'right-0 top-0 bottom-0 pr-[env(safe-area-inset-right)] flex-col w-20';
+      default: // bottom
+        return 'bottom-0 left-0 right-0 pb-[env(safe-area-inset-bottom)]';
+    }
+  };
+
+  const getInitialAnimation = () => {
+    switch (position) {
+      case 'top': return { y: -100, opacity: 0 };
+      case 'left': return { x: -100, opacity: 0 };
+      case 'right': return { x: 100, opacity: 0 };
+      default: return { y: 100, opacity: 0 };
+    }
+  };
+
+  const getFinalAnimation = () => {
+    return { x: 0, y: 0, opacity: 1 };
+  };
+
   return (
     <motion.nav
-      initial={{ y: 100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      initial={getInitialAnimation()}
+      animate={getFinalAnimation()}
       transition={{ delay: 0.15, type: 'spring', stiffness: 350, damping: 32 }}
-      className="bottom-nav"
+      className={cn(
+        'fixed z-50',
+        getPositionClasses()
+      )}
       dir={isRTL ? 'rtl' : 'ltr'}
     >
-      <div className="bottom-nav-container">
-        <div className="bottom-nav-bar">
-          <div className="flex items-center justify-around">
+      <div className={cn(
+        'mx-auto',
+        isVertical ? 'h-full py-4 px-2' : 'p-3 max-w-lg'
+      )}>
+        <div className={cn(
+          'glass-card px-2 py-2',
+          isVertical ? 'h-full flex flex-col justify-center' : ''
+        )}>
+          <div className={cn(
+            'flex items-center',
+            isVertical ? 'flex-col gap-2' : 'justify-around'
+          )}>
             {navItems.map((item, index) => (
               <motion.button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
                 whileTap={{ scale: 0.88 }}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: isVertical ? 0 : 16, x: isVertical ? (position === 'left' ? -16 : 16) : 0 }}
+                animate={{ opacity: 1, y: 0, x: 0 }}
                 transition={{ delay: 0.2 + index * 0.03 }}
                 className={cn(
-                  'nav-item',
-                  activeTab === item.id ? 'nav-item-active' : 'nav-item-inactive'
+                  'relative flex items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 min-w-[56px]',
+                  isVertical ? 'flex-col w-full' : 'flex-col',
+                  activeTab === item.id 
+                    ? 'text-primary' 
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {activeTab === item.id && (
                   <motion.div
                     layoutId="nav-indicator"
-                    className="nav-indicator"
+                    className="absolute inset-0 bg-primary/10 rounded-2xl"
                     transition={{ type: 'spring', stiffness: 450, damping: 32 }}
                   />
                 )}

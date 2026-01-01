@@ -1,13 +1,37 @@
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 interface FloatingActionButtonProps {
   onClick: () => void;
   isRTL?: boolean;
+  customPosition?: {
+    top?: number;
+    bottom?: number;
+    left?: number;
+    right?: number;
+  };
 }
 
-export const FloatingActionButton = ({ onClick, isRTL = false }: FloatingActionButtonProps) => {
+export const FloatingActionButton = ({ onClick, isRTL = false, customPosition }: FloatingActionButtonProps) => {
+  const getStyle = (): React.CSSProperties => {
+    if (customPosition) {
+      return {
+        top: customPosition.top,
+        bottom: customPosition.bottom,
+        left: customPosition.left,
+        right: customPosition.right,
+        background: 'var(--gradient-primary)',
+        boxShadow: '0 6px 24px hsl(211 100% 50% / 0.35)',
+      };
+    }
+    return {
+      bottom: 96,
+      ...(isRTL ? { left: 16 } : { right: 16 }),
+      background: 'var(--gradient-primary)',
+      boxShadow: '0 6px 24px hsl(211 100% 50% / 0.35)',
+    };
+  };
+
   return (
     <motion.button
       initial={{ scale: 0, opacity: 0 }}
@@ -16,10 +40,8 @@ export const FloatingActionButton = ({ onClick, isRTL = false }: FloatingActionB
       whileHover={{ scale: 1.06 }}
       whileTap={{ scale: 0.92 }}
       onClick={onClick}
-      className={cn(
-        "fab-button",
-        isRTL ? "left-4 bottom-24" : "right-4 bottom-24"
-      )}
+      className="fixed z-50 w-14 h-14 rounded-[1.25rem] flex items-center justify-center shadow-lg"
+      style={getStyle()}
     >
       <motion.div
         whileHover={{ rotate: 90 }}

@@ -320,8 +320,43 @@ const Index = () => {
     return labels[cat] || cat;
   };
 
+  // Layout padding based on nav position
+  const getLayoutClasses = () => {
+    switch (appSettings.navPosition) {
+      case 'top':
+        return 'pt-24 pb-6';
+      case 'left':
+        return 'pl-24 pr-4 pt-6 pb-6';
+      case 'right':
+        return 'pr-24 pl-4 pt-6 pb-6';
+      default: // bottom
+        return 'pb-28 pt-6';
+    }
+  };
+
+  const getMainClasses = () => {
+    const isVerticalNav = appSettings.navPosition === 'left' || appSettings.navPosition === 'right';
+    if (isVerticalNav) {
+      return 'max-w-2xl mx-auto px-4';
+    }
+    return 'max-w-lg mx-auto px-4';
+  };
+
+  const getFabPosition = () => {
+    switch (appSettings.navPosition) {
+      case 'top':
+        return { bottom: 24, right: isRTL ? undefined : 24, left: isRTL ? 24 : undefined };
+      case 'left':
+        return { bottom: 24, right: isRTL ? undefined : 24, left: isRTL ? 24 : undefined };
+      case 'right':
+        return { bottom: 24, left: isRTL ? undefined : 24, right: isRTL ? 24 : undefined };
+      default: // bottom
+        return { bottom: 100, right: isRTL ? undefined : 24, left: isRTL ? 24 : undefined };
+    }
+  };
+
   return (
-    <div className={cn("min-h-screen pb-28 relative safe-area-top", isRTL && "rtl")} dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className={cn("min-h-screen relative safe-area-top", getLayoutClasses(), isRTL && "rtl")} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Mesh Background */}
       <div className="mesh-background" />
 
@@ -373,11 +408,15 @@ const Index = () => {
 
       {/* Floating Action Button */}
       {activeTab !== 'settings' && (
-        <FloatingActionButton onClick={() => setIsAddTaskOpen(true)} isRTL={isRTL} />
+        <FloatingActionButton 
+          onClick={() => setIsAddTaskOpen(true)} 
+          isRTL={isRTL} 
+          customPosition={getFabPosition()}
+        />
       )}
 
       {/* Main Content */}
-      <main className="max-w-lg mx-auto px-4 pt-6 pb-4">
+      <main className={getMainClasses()}>
         <AnimatePresence mode="wait">
           {activeTab === 'dashboard' && (
             <motion.div
@@ -852,12 +891,13 @@ const Index = () => {
         </AnimatePresence>
       </main>
 
-      {/* Bottom Navigation */}
+      {/* Navigation */}
       <Navigation 
         activeTab={activeTab} 
         onTabChange={setActiveTab} 
         t={t}
         isRTL={isRTL}
+        position={appSettings.navPosition}
       />
     </div>
   );
