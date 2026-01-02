@@ -729,27 +729,41 @@ const Index = () => {
           )}
 
           {activeTab === 'calendar' && (
-            <CalendarView
+            <motion.div
               key="calendar"
-              tasks={tasks}
-              language={language}
-              t={t}
-              onAddTask={() => setIsAddTaskOpen(true)}
-              onSelectTask={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
-            />
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <CalendarView
+                tasks={tasks}
+                language={language}
+                t={t}
+                onAddTask={() => setIsAddTaskOpen(true)}
+                onSelectTask={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
+              />
+            </motion.div>
           )}
 
           {activeTab === 'stats' && (
-            <StatsPage
+            <motion.div
               key="stats"
-              tasks={tasks}
-              moods={moods}
-              totalPoints={totalPoints}
-              streak={streak}
-              t={t}
-              locale={dateLocale}
-              isRTL={isRTL}
-            />
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <StatsPage
+                tasks={tasks}
+                moods={moods}
+                totalPoints={totalPoints}
+                streak={streak}
+                t={t}
+                locale={dateLocale}
+                isRTL={isRTL}
+              />
+            </motion.div>
           )}
 
           {activeTab === 'mood' && (
@@ -882,29 +896,37 @@ const Index = () => {
           )}
 
           {activeTab === 'settings' && (
-            <SettingsPage
-              darkMode={darkMode}
-              onDarkModeChange={(value) => setThemeMode(value ? 'dark' : 'light')}
-              themeMode={themeMode}
-              onThemeModeChange={setThemeMode}
-              notifications={notifications}
-              onNotificationsChange={setNotifications}
-              fontSize={fontSize}
-              onFontSizeChange={setFontSize}
-              language={language}
-              onLanguageChange={setLanguage}
-              defaultReminder={defaultReminder}
-              onDefaultReminderChange={setDefaultReminder}
-              appSettings={appSettings}
-              onSettingsChange={handleSettingsChange}
-              onResetSettings={handleResetSettings}
-              stats={{
-                totalPoints,
-                streak,
-                tasksCompleted: tasks.filter(t => t.completed).length,
-              }}
-              t={t}
-            />
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <SettingsPage
+                darkMode={darkMode}
+                onDarkModeChange={(value) => setThemeMode(value ? 'dark' : 'light')}
+                themeMode={themeMode}
+                onThemeModeChange={setThemeMode}
+                notifications={notifications}
+                onNotificationsChange={setNotifications}
+                fontSize={fontSize}
+                onFontSizeChange={setFontSize}
+                language={language}
+                onLanguageChange={setLanguage}
+                defaultReminder={defaultReminder}
+                onDefaultReminderChange={setDefaultReminder}
+                appSettings={appSettings}
+                onSettingsChange={handleSettingsChange}
+                onResetSettings={handleResetSettings}
+                stats={{
+                  totalPoints,
+                  streak,
+                  tasksCompleted: tasks.filter(t => t.completed).length,
+                }}
+                t={t}
+              />
+            </motion.div>
           )}
         </AnimatePresence>
       </main>
