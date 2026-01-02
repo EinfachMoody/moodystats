@@ -85,14 +85,15 @@ export const ColorPicker = ({
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
 
-          {/* Popup */}
+          {/* Popup - zentriert mit gutem Abstand */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed left-4 right-4 top-1/2 -translate-y-1/2 z-50 max-w-sm mx-auto"
+            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            className="fixed left-5 right-5 top-1/2 -translate-y-1/2 z-50 max-w-[360px] mx-auto"
           >
-            <div className="glass-card p-5 rounded-3xl">
+            <div className="glass-card p-6 rounded-3xl">
               {/* Header */}
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-bold text-foreground">{t('colorsAccents')}</h3>
@@ -131,74 +132,79 @@ export const ColorPicker = ({
                 ))}
               </div>
 
-              {/* Hue Slider */}
-              <div className="mb-4">
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                  {t('hue')}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="360"
-                  value={hue}
-                  onChange={(e) => setHue(Number(e.target.value))}
-                  className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, 
-                      hsl(0, 100%, 50%), 
-                      hsl(60, 100%, 50%), 
-                      hsl(120, 100%, 50%), 
-                      hsl(180, 100%, 50%), 
-                      hsl(240, 100%, 50%), 
-                      hsl(300, 100%, 50%), 
-                      hsl(360, 100%, 50%)
-                    )`,
-                  }}
-                />
+              {/* Slider Container - bessere Erreichbarkeit */}
+              <div className="space-y-5 px-1">
+                {/* Hue Slider */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-3 block">
+                    {t('hue')}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={hue}
+                    onChange={(e) => setHue(Number(e.target.value))}
+                    className="w-full h-4 rounded-full appearance-none cursor-pointer touch-none"
+                    style={{
+                      background: `linear-gradient(to right, 
+                        hsl(0, 100%, 50%), 
+                        hsl(60, 100%, 50%), 
+                        hsl(120, 100%, 50%), 
+                        hsl(180, 100%, 50%), 
+                        hsl(240, 100%, 50%), 
+                        hsl(300, 100%, 50%), 
+                        hsl(360, 100%, 50%)
+                      )`,
+                    }}
+                  />
+                </div>
+
+                {/* Saturation Slider */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-3 block">
+                    {t('saturation')}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={saturation}
+                    onChange={(e) => setSaturation(Number(e.target.value))}
+                    className="w-full h-4 rounded-full appearance-none cursor-pointer touch-none"
+                    style={{
+                      background: `linear-gradient(to right, 
+                        hsl(${hue}, 0%, ${lightness}%), 
+                        hsl(${hue}, 100%, ${lightness}%)
+                      )`,
+                    }}
+                  />
+                </div>
+
+                {/* Lightness Slider */}
+                <div>
+                  <label className="text-xs font-medium text-muted-foreground mb-3 block">
+                    {t('lightness')}
+                  </label>
+                  <input
+                    type="range"
+                    min="10"
+                    max="90"
+                    value={lightness}
+                    onChange={(e) => setLightness(Number(e.target.value))}
+                    className="w-full h-4 rounded-full appearance-none cursor-pointer touch-none"
+                    style={{
+                      background: `linear-gradient(to right, 
+                        hsl(${hue}, ${saturation}%, 10%), 
+                        hsl(${hue}, ${saturation}%, 50%),
+                        hsl(${hue}, ${saturation}%, 90%)
+                      )`,
+                    }}
+                  />
+                </div>
               </div>
 
-              {/* Saturation Slider */}
-              <div className="mb-4">
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                  {t('saturation')}
-                </label>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={saturation}
-                  onChange={(e) => setSaturation(Number(e.target.value))}
-                  className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, 
-                      hsl(${hue}, 0%, ${lightness}%), 
-                      hsl(${hue}, 100%, ${lightness}%)
-                    )`,
-                  }}
-                />
-              </div>
-
-              {/* Lightness Slider */}
-              <div className="mb-5">
-                <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                  {t('lightness')}
-                </label>
-                <input
-                  type="range"
-                  min="10"
-                  max="90"
-                  value={lightness}
-                  onChange={(e) => setLightness(Number(e.target.value))}
-                  className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, 
-                      hsl(${hue}, ${saturation}%, 10%), 
-                      hsl(${hue}, ${saturation}%, 50%),
-                      hsl(${hue}, ${saturation}%, 90%)
-                    )`,
-                  }}
-                />
-              </div>
+              <div className="h-5" />
 
               {/* Actions */}
               <div className="flex gap-3">

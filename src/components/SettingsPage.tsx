@@ -242,23 +242,23 @@ export const SettingsPage = ({
           <div className="settings-group-header">
             <span className="settings-group-title">{t('themeMode')}</span>
           </div>
-          <div className="p-4">
-            <div className="flex gap-2">
+          <div className="p-5">
+            <div className="flex gap-3">
               {(['light', 'dark', 'system'] as const).map((mode) => (
                 <motion.button
                   key={mode}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => onThemeModeChange(mode)}
                   className={cn(
-                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2",
+                    "flex-1 py-4 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-2 min-h-[56px]",
                     themeMode === mode
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  {mode === 'light' && <Sun className="w-4 h-4" />}
-                  {mode === 'dark' && <Moon className="w-4 h-4" />}
-                  {mode === 'system' && <Monitor className="w-4 h-4" />}
+                  {mode === 'light' && <Sun className="w-5 h-5" />}
+                  {mode === 'dark' && <Moon className="w-5 h-5" />}
+                  {mode === 'system' && <Monitor className="w-5 h-5" />}
                   {t(`${mode}Mode`)}
                 </motion.button>
               ))}
@@ -271,15 +271,15 @@ export const SettingsPage = ({
           <div className="settings-group-header">
             <span className="settings-group-title">{t('fontSize')}</span>
           </div>
-          <div className="p-4">
-            <div className="flex gap-2">
+          <div className="p-5">
+            <div className="flex gap-3">
               {(['small', 'medium', 'large'] as const).map((size) => (
                 <motion.button
                   key={size}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => onFontSizeChange(size)}
                   className={cn(
-                    "flex-1 py-3 rounded-xl font-medium transition-all",
+                    "flex-1 py-4 rounded-2xl font-medium transition-all min-h-[56px]",
                     fontSize === size
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted',
@@ -317,24 +317,24 @@ export const SettingsPage = ({
           <div className="settings-group-header">
             <span className="settings-group-title">{t('layoutView')}</span>
           </div>
-          <div className="p-4 space-y-4">
-            <p className="text-xs text-muted-foreground mb-2">{t('taskViewMode')}</p>
-            <div className="flex gap-2">
+          <div className="p-5 space-y-4">
+            <p className="text-xs text-muted-foreground mb-3">{t('taskViewMode')}</p>
+            <div className="flex gap-3">
               {(['compact', 'standard', 'cards'] as TaskViewMode[]).map((mode) => (
                 <motion.button
                   key={mode}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => onSettingsChange({ taskViewMode: mode })}
                   className={cn(
-                    "flex-1 py-3 rounded-xl text-sm font-medium transition-all flex flex-col items-center gap-1",
+                    "flex-1 py-4 rounded-2xl text-sm font-medium transition-all flex flex-col items-center gap-2 min-h-[72px]",
                     appSettings.taskViewMode === mode
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                   )}
                 >
-                  {mode === 'compact' && <LayoutList className="w-4 h-4" />}
-                  {mode === 'standard' && <LayoutList className="w-4 h-4" />}
-                  {mode === 'cards' && <LayoutGrid className="w-4 h-4" />}
+                  {mode === 'compact' && <LayoutList className="w-5 h-5" />}
+                  {mode === 'standard' && <LayoutList className="w-5 h-5" />}
+                  {mode === 'cards' && <LayoutGrid className="w-5 h-5" />}
                   <span className="text-xs">{t(mode)}</span>
                 </motion.button>
               ))}
@@ -347,17 +347,17 @@ export const SettingsPage = ({
           <div className="settings-group-header">
             <span className="settings-group-title">{t('sizeDensity')}</span>
           </div>
-          <div className="p-4 space-y-4">
+          <div className="p-5 space-y-5">
             <div>
-              <p className="text-xs text-muted-foreground mb-2">{t('textSize')}</p>
-              <div className="flex gap-2">
+              <p className="text-xs text-muted-foreground mb-3">{t('textSize')}</p>
+              <div className="flex gap-3">
                 {(['small', 'normal', 'large'] as TextSize[]).map((size) => (
                   <motion.button
                     key={size}
-                    whileTap={{ scale: 0.95 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => onSettingsChange({ textSize: size })}
                     className={cn(
-                      "flex-1 py-2.5 rounded-xl font-medium transition-all",
+                      "flex-1 py-3.5 rounded-2xl font-medium transition-all min-h-[52px]",
                       appSettings.textSize === size
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted/50 text-muted-foreground hover:bg-muted',
@@ -372,15 +372,15 @@ export const SettingsPage = ({
               </div>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground mb-2">{t('uiDensity')}</p>
-              <div className="flex gap-2">
+              <p className="text-xs text-muted-foreground mb-3">{t('uiDensity')}</p>
+              <div className="flex gap-3">
                 {(['compact', 'normal'] as UIDensity[]).map((density) => (
                   <motion.button
                     key={density}
-                    whileTap={{ scale: 0.95 }}
+                    whileTap={{ scale: 0.97 }}
                     onClick={() => onSettingsChange({ uiDensity: density })}
                     className={cn(
-                      "flex-1 py-2.5 rounded-xl text-sm font-medium transition-all",
+                      "flex-1 py-3.5 rounded-2xl text-sm font-medium transition-all min-h-[52px]",
                       appSettings.uiDensity === density
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted/50 text-muted-foreground hover:bg-muted'
@@ -411,20 +411,20 @@ export const SettingsPage = ({
           </SettingsRow>
         </GlassCard>
 
-        {/* Navigation Position */}
+        {/* Navigation Position - bessere Touch-Zonen */}
         <GlassCard className="!p-0 overflow-hidden">
           <div className="settings-group-header">
             <span className="settings-group-title">{t('navPosition')}</span>
           </div>
-          <div className="p-4">
-            <div className="grid grid-cols-2 gap-2">
+          <div className="p-5">
+            <div className="grid grid-cols-2 gap-3">
               {(['bottom', 'top', 'left', 'right'] as const).map((pos) => (
                 <motion.button
                   key={pos}
-                  whileTap={{ scale: 0.95 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => onSettingsChange({ navPosition: pos })}
                   className={cn(
-                    "py-3 rounded-xl text-sm font-medium transition-all flex items-center justify-center gap-2",
+                    "py-4 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-2 min-h-[56px]",
                     appSettings.navPosition === pos
                       ? 'bg-primary text-primary-foreground shadow-lg'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted'
