@@ -118,15 +118,15 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd, t, language }: AddTaskDi
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
             className={cn(
-              "fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto",
+              "fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto",
               isSaving && "animate-pulse"
             )}
             dir={isRTL ? 'rtl' : 'ltr'}
           >
             <motion.div 
-              className="glass-card rounded-t-3xl rounded-b-none p-6 pb-8"
+              className="glass-card rounded-t-3xl rounded-b-none px-5 pt-5 pb-[calc(env(safe-area-inset-bottom)+6rem)]"
               animate={isSaving ? { scale: [1, 1.02, 0.98, 1] } : {}}
               transition={{ duration: 0.3 }}
             >

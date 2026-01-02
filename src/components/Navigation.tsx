@@ -88,12 +88,12 @@ export const Navigation = ({ activeTab, onTabChange, t, isRTL = false, position 
               <motion.button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                whileTap={{ scale: 0.88 }}
-                initial={{ opacity: 0, y: isVertical ? 0 : 16, x: isVertical ? (position === 'left' ? -16 : 16) : 0 }}
-                animate={{ opacity: 1, y: 0, x: 0 }}
-                transition={{ delay: 0.2 + index * 0.03 }}
+                whileTap={{ scale: 0.92 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.15 + index * 0.02 }}
                 className={cn(
-                  'relative flex items-center justify-center gap-1 px-3 py-2 rounded-2xl transition-all duration-300 min-w-[56px]',
+                  'relative flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl transition-colors duration-200 min-w-[60px] min-h-[52px]',
                   isVertical ? 'flex-col w-full' : 'flex-col',
                   activeTab === item.id 
                     ? 'text-primary' 

@@ -438,14 +438,14 @@ const Index = () => {
 
       {/* Main Content */}
       <main className={getMainClasses()}>
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           {activeTab === 'dashboard' && (
             <motion.div
               key="dashboard"
-              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="space-y-5"
             >
               {/* Header */}
@@ -586,10 +586,10 @@ const Index = () => {
           {activeTab === 'tasks' && (
             <motion.div
               key="tasks"
-              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="space-y-4"
             >
               <div className="flex items-center justify-between">
@@ -755,10 +755,10 @@ const Index = () => {
           {activeTab === 'mood' && (
             <motion.div
               key="mood"
-              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="space-y-5"
             >
               <h1 className="text-2xl font-bold text-foreground">{t('moodTracker')}</h1>
@@ -790,10 +790,10 @@ const Index = () => {
           {activeTab === 'journal' && (
             <motion.div
               key="journal"
-              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
               className="space-y-5"
             >
               <h1 className="text-2xl font-bold text-foreground">{t('journal')}</h1>
