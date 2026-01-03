@@ -88,20 +88,21 @@ export const SettingsPage = ({
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+    visible: { opacity: 1, transition: { staggerChildren: 0.03 } }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.15 } }
   };
 
   const BackButton = ({ title }: { title: string }) => (
     <motion.button
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15 }}
       onClick={() => setCurrentView('main')}
-      className="flex items-center gap-2 mb-4 text-primary touch-feedback"
+      className="flex items-center gap-2 mb-4 text-primary touch-feedback min-h-[44px]"
     >
       <ChevronLeft className="w-5 h-5" />
       <span className="font-medium">{t('settings')}</span>

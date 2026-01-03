@@ -126,10 +126,10 @@ export const CalendarView = ({
         {(['month', 'week', 'day'] as ViewMode[]).map((mode) => (
           <motion.button
             key={mode}
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.96 }}
             onClick={() => setViewMode(mode)}
             className={cn(
-              'flex-1 py-2 rounded-xl text-sm font-medium transition-all',
+              'flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors min-h-[44px]',
               viewMode === mode
                 ? 'bg-primary text-primary-foreground'
                 : 'bg-muted/50 text-muted-foreground'
@@ -144,22 +144,39 @@ export const CalendarView = ({
       <GlassCard className="!p-4">
         <div className="flex items-center justify-between mb-4">
           <motion.button
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scale: 0.94 }}
             onClick={() => navigate('prev')}
-            className="p-2 rounded-xl hover:bg-muted/50 transition-colors"
+            className="p-2.5 rounded-xl hover:bg-muted/50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <ChevronLeft className={cn("w-5 h-5 text-foreground", isRTL && "rotate-180")} />
           </motion.button>
-          <h2 className="text-lg font-semibold text-foreground">
-            {viewMode === 'day' 
-              ? format(currentDate, 'EEEE, d MMMM yyyy', { locale })
-              : format(currentDate, 'MMMM yyyy', { locale })
-            }
-          </h2>
+          
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">
+              {viewMode === 'day' 
+                ? format(currentDate, 'EEEE, d MMMM yyyy', { locale })
+                : format(currentDate, 'MMMM yyyy', { locale })
+              }
+            </h2>
+            {/* Today Button */}
+            {!isToday(currentDate) && (
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setCurrentDate(new Date());
+                  setSelectedDate(new Date());
+                }}
+                className="px-2.5 py-1 text-xs font-medium bg-primary/10 text-primary rounded-lg"
+              >
+                {t('today')}
+              </motion.button>
+            )}
+          </div>
+          
           <motion.button
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scale: 0.94 }}
             onClick={() => navigate('next')}
-            className="p-2 rounded-xl hover:bg-muted/50 transition-colors"
+            className="p-2.5 rounded-xl hover:bg-muted/50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
           >
             <ChevronRight className={cn("w-5 h-5 text-foreground", isRTL && "rotate-180")} />
           </motion.button>
@@ -195,10 +212,10 @@ export const CalendarView = ({
                 return (
                   <motion.button
                     key={index}
-                    whileTap={{ scale: 0.95 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => setSelectedDate(day)}
                     className={cn(
-                      'relative aspect-square p-1 rounded-xl transition-all flex flex-col items-center justify-start',
+                      'relative aspect-square p-1 rounded-xl transition-colors flex flex-col items-center justify-start min-h-[40px]',
                       !isCurrentMonth && 'opacity-30',
                       isSelected && 'bg-primary text-primary-foreground',
                       !isSelected && isTodayDate && 'bg-primary/20',

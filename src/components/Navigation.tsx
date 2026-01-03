@@ -65,7 +65,7 @@ export const Navigation = ({ activeTab, onTabChange, t, isRTL = false, position 
     <motion.nav
       initial={getInitialAnimation()}
       animate={getFinalAnimation()}
-      transition={{ delay: 0.15, type: 'spring', stiffness: 350, damping: 32 }}
+      transition={{ delay: 0.1, duration: 0.25, ease: 'easeOut' }}
       className={cn(
         'fixed z-50',
         getPositionClasses()
@@ -88,12 +88,9 @@ export const Navigation = ({ activeTab, onTabChange, t, isRTL = false, position 
               <motion.button
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
-                whileTap={{ scale: 0.92 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.15 + index * 0.02 }}
+                whileTap={{ scale: 0.94 }}
                 className={cn(
-                  'relative flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl transition-colors duration-200 min-w-[60px] min-h-[52px]',
+                  'relative flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl transition-colors duration-150 min-w-[60px] min-h-[52px]',
                   isVertical ? 'flex-col w-full' : 'flex-col',
                   activeTab === item.id 
                     ? 'text-primary' 
@@ -104,21 +101,20 @@ export const Navigation = ({ activeTab, onTabChange, t, isRTL = false, position 
                   <motion.div
                     layoutId="nav-indicator"
                     className="absolute inset-0 bg-primary/10 rounded-2xl"
-                    transition={{ type: 'spring', stiffness: 450, damping: 32 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
                   />
                 )}
-                <motion.div
-                  animate={activeTab === item.id ? { scale: 1.1 } : { scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className="relative z-10"
-                >
+                <div className="relative z-10">
                   <item.icon 
-                    className="w-[22px] h-[22px]" 
+                    className={cn(
+                      "w-[22px] h-[22px] transition-transform duration-150",
+                      activeTab === item.id && "scale-110"
+                    )}
                     strokeWidth={activeTab === item.id ? 2.2 : 1.6} 
                   />
-                </motion.div>
+                </div>
                 <span className={cn(
-                  "text-[10px] font-medium relative z-10 transition-all leading-tight",
+                  "text-[10px] font-medium relative z-10 leading-tight",
                   activeTab === item.id && "font-semibold"
                 )}>
                   {getLabel(item.id)}

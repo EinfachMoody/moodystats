@@ -282,6 +282,10 @@ const Index = () => {
     setTaskPages(prev => [...prev, newPage]);
   }, [taskPages, setTaskPages]);
 
+  const handleReorderPages = useCallback((reorderedPages: TaskPage[]) => {
+    setTaskPages(reorderedPages);
+  }, [setTaskPages]);
+
   const handleUpdatePage = useCallback((updatedPage: TaskPage) => {
     setTaskPages(prev => prev.map(p => p.id === updatedPage.id ? updatedPage : p));
   }, [setTaskPages]);
@@ -424,6 +428,7 @@ const Index = () => {
         onAddPage={handleAddPage}
         onUpdatePage={handleUpdatePage}
         onDeletePage={handleDeletePage}
+        onReorderPages={handleReorderPages}
         t={t}
       />
 
@@ -467,7 +472,7 @@ const Index = () => {
                 </motion.h1>
               </div>
 
-              {/* Stats Grid */}
+              {/* Stats Grid - Enhanced */}
               <div className="grid grid-cols-2 gap-3">
                 <StatsCard
                   title={t('points')}
@@ -484,6 +489,22 @@ const Index = () => {
                   gradient="from-secondary to-rose-500"
                   delay={0.1}
                 />
+              </div>
+
+              {/* Quick Overview Row */}
+              <div className="grid grid-cols-3 gap-2">
+                <GlassCard className="!p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">{tasks.filter(t => !t.completed).length}</p>
+                  <p className="text-[9px] text-muted-foreground">{t('pending')}</p>
+                </GlassCard>
+                <GlassCard className="!p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">{todayTasks.length}</p>
+                  <p className="text-[9px] text-muted-foreground">{t('today')}</p>
+                </GlassCard>
+                <GlassCard className="!p-3 text-center">
+                  <p className="text-lg font-bold text-foreground">{tasks.filter(t => t.completed).length}</p>
+                  <p className="text-[9px] text-muted-foreground">{t('completed')}</p>
+                </GlassCard>
               </div>
 
               {/* Focus Tasks */}
@@ -578,6 +599,36 @@ const Index = () => {
                       <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} />
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Upcoming Tasks Preview */}
+              {tasks.filter(t => !t.completed && new Date(t.dueDate) > new Date()).length > 0 && (
+                <div>
+                  <h3 className="font-semibold text-foreground flex items-center gap-2 mb-3 text-sm">
+                    <Calendar className="w-4 h-4 text-primary" />
+                    {t('upcoming')}
+                  </h3>
+                  <GlassCard className="!p-3">
+                    <div className="space-y-2">
+                      {tasks
+                        .filter(t => !t.completed && new Date(t.dueDate) > new Date())
+                        .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+                        .slice(0, 3)
+                        .map((task) => (
+                          <div key={task.id} className="flex items-center gap-3 py-1.5">
+                            <div 
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: task.pageId ? taskPages.find(p => p.id === task.pageId)?.accentColor : 'hsl(var(--primary))' }}
+                            />
+                            <span className="text-sm flex-1 truncate">{task.title}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                              {format(new Date(task.dueDate), 'MMM d', { locale: dateLocale })}
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                  </GlassCard>
                 </div>
               )}
             </motion.div>
