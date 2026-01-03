@@ -12,9 +12,13 @@ import {
   Activity,
   PieChart,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Timer,
+  Repeat,
+  Star,
+  Brain
 } from 'lucide-react';
-import { format, startOfWeek, eachDayOfInterval, isToday, subDays, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
+import { format, startOfWeek, eachDayOfInterval, isToday, subDays, startOfMonth, endOfMonth, isSameDay, differenceInDays, getHours } from 'date-fns';
 import { GlassCard } from './GlassCard';
 import { Task, MoodEntry, MoodType, MOOD_EMOJIS } from '@/types';
 import { cn } from '@/lib/utils';
@@ -135,6 +139,43 @@ export const StatsPage = ({
     ? Math.round(((weeklyTotal - lastWeekCompleted) / lastWeekCompleted) * 100)
     : weeklyTotal > 0 ? 100 : 0;
 
+  // NEW: Most productive time of day
+  const hourlyStats: Record<number, number> = {};
+  completedTasks.forEach(t => {
+    if (t.completedAt) {
+      const hour = getHours(new Date(t.completedAt));
+      hourlyStats[hour] = (hourlyStats[hour] || 0) + 1;
+    }
+  });
+  const mostProductiveHour = Object.entries(hourlyStats).sort((a, b) => b[1] - a[1])[0];
+  const mostProductiveTime = mostProductiveHour 
+    ? `${mostProductiveHour[0].padStart(2, '0')}:00` 
+    : '--:--';
+
+  // NEW: Focus task stats
+  const focusTasksCompleted = completedTasks.filter(t => t.isFocus).length;
+
+  // NEW: Recurring tasks stats
+  const recurringTasks = tasks.filter(t => t.repeat !== 'none');
+  const recurringCompleted = completedTasks.filter(t => t.repeat !== 'none').length;
+
+  // NEW: Average task completion time (days from creation to completion)
+  const taskDurations = completedTasks
+    .filter(t => t.completedAt)
+    .map(t => differenceInDays(new Date(t.completedAt!), new Date(t.dueDate)));
+  const avgCompletionDays = taskDurations.length > 0
+    ? (taskDurations.reduce((a, b) => a + b, 0) / taskDurations.length).toFixed(1)
+    : '0';
+
+  // NEW: Tasks overdue vs on-time
+  const onTimeTasks = completedTasks.filter(t => 
+    t.completedAt && new Date(t.completedAt) <= new Date(t.dueDate)
+  ).length;
+  const overdueTasks = completedTasks.length - onTimeTasks;
+  const onTimeRate = completedTasks.length > 0 
+    ? Math.round((onTimeTasks / completedTasks.length) * 100)
+    : 0;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -246,6 +287,56 @@ export const StatsPage = ({
           <PieChart className="w-4 h-4 text-accent mx-auto mb-1" />
           <p className="text-lg font-bold text-foreground">{completionRate}%</p>
           <p className="text-[9px] text-muted-foreground">{t('completionRate')}</p>
+        </GlassCard>
+      </motion.div>
+
+      {/* NEW: Extended Stats Row 2 */}
+      <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2">
+        <GlassCard className="!p-3 text-center">
+          <Timer className="w-4 h-4 text-purple-500 mx-auto mb-1" />
+          <p className="text-lg font-bold text-foreground">{mostProductiveTime}</p>
+          <p className="text-[9px] text-muted-foreground">{t('mostProductiveTime')}</p>
+        </GlassCard>
+
+        <GlassCard className="!p-3 text-center">
+          <Star className="w-4 h-4 text-yellow-500 mx-auto mb-1" />
+          <p className="text-lg font-bold text-foreground">{focusTasksCompleted}</p>
+          <p className="text-[9px] text-muted-foreground">{t('dailyFocus')}</p>
+        </GlassCard>
+
+        <GlassCard className="!p-3 text-center">
+          <Repeat className="w-4 h-4 text-teal-500 mx-auto mb-1" />
+          <p className="text-lg font-bold text-foreground">{recurringCompleted}/{recurringTasks.length}</p>
+          <p className="text-[9px] text-muted-foreground">{t('repeat')}</p>
+        </GlassCard>
+      </motion.div>
+
+      {/* NEW: On-Time Performance */}
+      <motion.div variants={itemVariants}>
+        <GlassCard className="!p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Brain className="w-4 h-4 text-indigo-500" />
+              <h3 className="font-semibold text-foreground text-sm">On-Time Performance</h3>
+            </div>
+            <span className="text-xs font-medium text-primary">{onTimeRate}%</span>
+          </div>
+          <div className="flex gap-2 mb-2">
+            <div className="flex-1">
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${onTimeRate}%` }}
+                  transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
+                  className="h-full rounded-full bg-gradient-to-r from-accent to-emerald-400"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>✅ On time: {onTimeTasks}</span>
+            <span>⚠️ Overdue: {overdueTasks}</span>
+          </div>
         </GlassCard>
       </motion.div>
 
