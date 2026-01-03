@@ -85,15 +85,15 @@ export const ColorPicker = ({
             className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50"
           />
 
-          {/* Popup - zentriert mit gutem Abstand */}
+          {/* Popup - ergonomisch mittig, mit Safe-Area & Bottom-Nav Abstand */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-            className="fixed left-5 right-5 top-1/2 -translate-y-1/2 z-50 max-w-[360px] mx-auto"
+            className="fixed inset-0 z-50 flex items-center justify-center px-5 pt-[calc(env(safe-area-inset-top)+1rem)] pb-[calc(env(safe-area-inset-bottom)+6.5rem)]"
           >
-            <div className="glass-card p-6 rounded-3xl">
+            <div className="glass-card p-6 rounded-3xl w-full max-w-[360px] max-h-full overflow-y-auto overscroll-contain">
               {/* Header */}
               <div className="flex items-center justify-between mb-5">
                 <h3 className="text-lg font-bold text-foreground">{t('colorsAccents')}</h3>
@@ -132,8 +132,8 @@ export const ColorPicker = ({
                 ))}
               </div>
 
-              {/* Slider Container - bessere Erreichbarkeit */}
-              <div className="space-y-5 px-1">
+              {/* Slider Container - mehr Innenabstand, damit der Thumb nie am Rand klebt */}
+              <div className="space-y-5 px-4">
                 {/* Hue Slider */}
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-3 block">
@@ -145,7 +145,7 @@ export const ColorPicker = ({
                     max="360"
                     value={hue}
                     onChange={(e) => setHue(Number(e.target.value))}
-                    className="w-full h-4 rounded-full appearance-none cursor-pointer touch-none"
+                    className="w-full h-5 rounded-full appearance-none cursor-pointer touch-none"
                     style={{
                       background: `linear-gradient(to right, 
                         hsl(0, 100%, 50%), 
@@ -171,7 +171,7 @@ export const ColorPicker = ({
                     max="100"
                     value={saturation}
                     onChange={(e) => setSaturation(Number(e.target.value))}
-                    className="w-full h-4 rounded-full appearance-none cursor-pointer touch-none"
+                    className="w-full h-5 rounded-full appearance-none cursor-pointer touch-none"
                     style={{
                       background: `linear-gradient(to right, 
                         hsl(${hue}, 0%, ${lightness}%), 
@@ -192,7 +192,7 @@ export const ColorPicker = ({
                     max="90"
                     value={lightness}
                     onChange={(e) => setLightness(Number(e.target.value))}
-                    className="w-full h-4 rounded-full appearance-none cursor-pointer touch-none"
+                    className="w-full h-5 rounded-full appearance-none cursor-pointer touch-none"
                     style={{
                       background: `linear-gradient(to right, 
                         hsl(${hue}, ${saturation}%, 10%), 
