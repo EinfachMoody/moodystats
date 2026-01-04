@@ -318,9 +318,9 @@ export const CalendarView = ({
             {selectedDateTasks.map((task, index) => (
               <motion.div
                 key={task.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.04, duration: 0.18, ease: 'easeOut' }}
               >
                 <GlassCard 
                   className="!p-3 cursor-pointer"

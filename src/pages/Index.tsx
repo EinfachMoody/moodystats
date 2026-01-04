@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Zap, 
@@ -140,17 +140,25 @@ const Index = () => {
     }
   }, [moods]);
 
-  const completedToday = tasks.filter(t => t.completed).length;
-  const todayTasks = tasks.filter(t => 
-    format(new Date(t.dueDate), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
-  );
-  const focusTasks = tasks.filter(t => t.isFocus && !t.completed);
+  const completedTasksCount = useMemo(() => tasks.filter(t => t.completed).length, [tasks]);
+  const pendingTasksCount = useMemo(() => tasks.filter(t => !t.completed).length, [tasks]);
 
-  const filteredTasks = selectedPageId 
-    ? tasks.filter(t => t.pageId === selectedPageId)
-    : filterCategory === 'all' 
-      ? tasks 
-      : tasks.filter(t => t.category === filterCategory);
+  // NOTE: keep existing behavior ("completedToday" currently represents total completed tasks)
+  const completedToday = completedTasksCount;
+
+  const todayTasks = useMemo(() => (
+    tasks.filter(t => format(new Date(t.dueDate), 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd'))
+  ), [tasks]);
+
+  const focusTasks = useMemo(() => (
+    tasks.filter(t => t.isFocus && !t.completed)
+  ), [tasks]);
+
+  const filteredTasks = useMemo(() => {
+    if (selectedPageId) return tasks.filter(t => t.pageId === selectedPageId);
+    if (filterCategory === 'all') return tasks;
+    return tasks.filter(t => t.category === filterCategory);
+  }, [tasks, selectedPageId, filterCategory]);
 
   const handleCompleteTask = useCallback((id: string) => {
     setTasks(prev => prev.map(task => {
@@ -443,7 +451,7 @@ const Index = () => {
 
       {/* Main Content */}
       <main className={getMainClasses()}>
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="sync" initial={false}>
           {activeTab === 'dashboard' && (
             <motion.div
               key="dashboard"
@@ -456,16 +464,17 @@ const Index = () => {
               {/* Header */}
               <div>
                 <motion.p 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
                   className="text-muted-foreground text-sm"
                 >
                   {format(new Date(), 'EEEE, MMMM d', { locale: dateLocale })}
                 </motion.p>
                 <motion.h1 
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.08, duration: 0.2, ease: 'easeOut' }}
                   className="text-2xl font-bold text-foreground mt-1"
                 >
                   {greetingMessage()} ✨
@@ -494,7 +503,7 @@ const Index = () => {
               {/* Quick Overview Row */}
               <div className="grid grid-cols-3 gap-2">
                 <GlassCard className="!p-3 text-center">
-                  <p className="text-lg font-bold text-foreground">{tasks.filter(t => !t.completed).length}</p>
+                  <p className="text-lg font-bold text-foreground">{pendingTasksCount}</p>
                   <p className="text-[9px] text-muted-foreground">{t('pending')}</p>
                 </GlassCard>
                 <GlassCard className="!p-3 text-center">
@@ -502,7 +511,7 @@ const Index = () => {
                   <p className="text-[9px] text-muted-foreground">{t('today')}</p>
                 </GlassCard>
                 <GlassCard className="!p-3 text-center">
-                  <p className="text-lg font-bold text-foreground">{tasks.filter(t => t.completed).length}</p>
+                  <p className="text-lg font-bold text-foreground">{completedTasksCount}</p>
                   <p className="text-[9px] text-muted-foreground">{t('completed')}</p>
                 </GlassCard>
               </div>
@@ -973,7 +982,7 @@ const Index = () => {
                 stats={{
                   totalPoints,
                   streak,
-                  tasksCompleted: tasks.filter(t => t.completed).length,
+                  tasksCompleted: completedTasksCount,
                 }}
                 t={t}
               />
