@@ -259,6 +259,9 @@ export const translations = {
     weeklyGoal: 'Weekly Goal',
     monthlyProgress: 'Monthly Progress',
     insights: 'Insights',
+    topCategory: 'Top Category',
+    streakHistory: 'Streak History',
+    focusQuote: 'Focus Rate',
     
     // Quick Actions
     quickActions: 'Quick Actions',
@@ -483,6 +486,9 @@ export const translations = {
     weeklyGoal: 'Wochenziel',
     monthlyProgress: 'Monatsfortschritt',
     insights: 'Einblicke',
+    topCategory: 'Top-Kategorie',
+    streakHistory: 'Streak-Verlauf',
+    focusQuote: 'Fokus-Quote',
     
     // Quick Actions
     quickActions: 'Schnellaktionen',
