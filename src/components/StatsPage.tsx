@@ -16,9 +16,12 @@ import {
   Timer,
   Repeat,
   Star,
-  Brain
+  Brain,
+  Crown,
+  Focus,
+  Sparkles
 } from 'lucide-react';
-import { format, startOfWeek, eachDayOfInterval, isToday, subDays, startOfMonth, endOfMonth, isSameDay, differenceInDays, getHours } from 'date-fns';
+import { format, startOfWeek, eachDayOfInterval, isToday, subDays, startOfMonth, endOfMonth, isSameDay, differenceInDays, getHours, subWeeks } from 'date-fns';
 import { GlassCard } from './GlassCard';
 import { Task, MoodEntry, MoodType, MOOD_EMOJIS } from '@/types';
 import { cn } from '@/lib/utils';
@@ -152,14 +155,18 @@ export const StatsPage = ({
     ? `${mostProductiveHour[0].padStart(2, '0')}:00` 
     : '--:--';
 
-  // NEW: Focus task stats
+  // Focus task stats
   const focusTasksCompleted = completedTasks.filter(t => t.isFocus).length;
+  const totalFocusTasks = tasks.filter(t => t.isFocus).length;
+  const focusQuote = totalFocusTasks > 0 
+    ? Math.round((focusTasksCompleted / totalFocusTasks) * 100) 
+    : 0;
 
-  // NEW: Recurring tasks stats
+  // Recurring tasks stats
   const recurringTasks = tasks.filter(t => t.repeat !== 'none');
   const recurringCompleted = completedTasks.filter(t => t.repeat !== 'none').length;
 
-  // NEW: Average task completion time (days from creation to completion)
+  // Average task completion time (days from creation to completion)
   const taskDurations = completedTasks
     .filter(t => t.completedAt)
     .map(t => differenceInDays(new Date(t.completedAt!), new Date(t.dueDate)));
@@ -167,7 +174,7 @@ export const StatsPage = ({
     ? (taskDurations.reduce((a, b) => a + b, 0) / taskDurations.length).toFixed(1)
     : '0';
 
-  // NEW: Tasks overdue vs on-time
+  // Tasks overdue vs on-time
   const onTimeTasks = completedTasks.filter(t => 
     t.completedAt && new Date(t.completedAt) <= new Date(t.dueDate)
   ).length;
@@ -175,6 +182,37 @@ export const StatsPage = ({
   const onTimeRate = completedTasks.length > 0 
     ? Math.round((onTimeTasks / completedTasks.length) * 100)
     : 0;
+
+  // Top category
+  const topCategory = Object.entries(categoryStats).sort((a, b) => b[1] - a[1])[0];
+  const topCategoryName = topCategory?.[0] || 'work';
+  const topCategoryCount = topCategory?.[1] || 0;
+
+  // Streak history (last 7 days)
+  const streakHistory = Array.from({ length: 7 }, (_, i) => {
+    const date = subDays(today, 6 - i);
+    const dayStr = format(date, 'yyyy-MM-dd');
+    const completed = completedTasks.filter(t => 
+      t.completedAt && format(new Date(t.completedAt), 'yyyy-MM-dd') === dayStr
+    ).length;
+    return {
+      day: format(date, 'EEE', { locale }),
+      completed,
+      hasActivity: completed > 0,
+      isToday: isToday(date),
+    };
+  });
+
+  // Weekly streak count (days with at least 1 task completed)
+  const weeklyStreakDays = streakHistory.filter(d => d.hasActivity).length;
+
+  // Points per category
+  const categoryPoints = {
+    work: completedTasks.filter(t => t.category === 'work').reduce((sum, t) => sum + t.points, 0),
+    personal: completedTasks.filter(t => t.category === 'personal').reduce((sum, t) => sum + t.points, 0),
+    health: completedTasks.filter(t => t.category === 'health').reduce((sum, t) => sum + t.points, 0),
+    other: completedTasks.filter(t => t.category === 'other').reduce((sum, t) => sum + t.points, 0),
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -290,7 +328,7 @@ export const StatsPage = ({
         </GlassCard>
       </motion.div>
 
-      {/* NEW: Extended Stats Row 2 */}
+      {/* Extended Stats Row 2 */}
       <motion.div variants={itemVariants} className="grid grid-cols-3 gap-2">
         <GlassCard className="!p-3 text-center">
           <Timer className="w-4 h-4 text-purple-500 mx-auto mb-1" />
@@ -300,7 +338,7 @@ export const StatsPage = ({
 
         <GlassCard className="!p-3 text-center">
           <Star className="w-4 h-4 text-yellow-500 mx-auto mb-1" />
-          <p className="text-lg font-bold text-foreground">{focusTasksCompleted}</p>
+          <p className="text-lg font-bold text-foreground">{focusQuote}%</p>
           <p className="text-[9px] text-muted-foreground">{t('dailyFocus')}</p>
         </GlassCard>
 
@@ -308,6 +346,92 @@ export const StatsPage = ({
           <Repeat className="w-4 h-4 text-teal-500 mx-auto mb-1" />
           <p className="text-lg font-bold text-foreground">{recurringCompleted}/{recurringTasks.length}</p>
           <p className="text-[9px] text-muted-foreground">{t('repeat')}</p>
+        </GlassCard>
+      </motion.div>
+
+      {/* Focus Quote & Top Category */}
+      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3">
+        <GlassCard className="!p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 rounded-lg bg-yellow-500/10">
+              <Sparkles className="w-4 h-4 text-yellow-500" />
+            </div>
+            <span className="text-xs text-muted-foreground">{t('dailyFocus')}</span>
+          </div>
+          <p className="text-2xl font-bold text-foreground">{focusTasksCompleted}<span className="text-sm font-normal text-muted-foreground">/{totalFocusTasks}</span></p>
+          <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${focusQuote}%` }}
+              transition={{ delay: 0.4, duration: 0.5, ease: 'easeOut' }}
+              className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400"
+            />
+          </div>
+        </GlassCard>
+
+        <GlassCard className="!p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={cn(
+              "p-1.5 rounded-lg",
+              topCategoryName === 'work' && "bg-purple-500/10",
+              topCategoryName === 'personal' && "bg-primary/10",
+              topCategoryName === 'health' && "bg-accent/10",
+              topCategoryName === 'other' && "bg-muted"
+            )}>
+              <Crown className={cn(
+                "w-4 h-4",
+                topCategoryName === 'work' && "text-purple-500",
+                topCategoryName === 'personal' && "text-primary",
+                topCategoryName === 'health' && "text-accent",
+                topCategoryName === 'other' && "text-muted-foreground"
+              )} />
+            </div>
+            <span className="text-xs text-muted-foreground">{t('topCategory')}</span>
+          </div>
+          <p className="text-lg font-bold text-foreground capitalize">{t(topCategoryName)}</p>
+          <p className="text-xs text-muted-foreground">{topCategoryCount} {t('tasksCompleted').toLowerCase()}</p>
+        </GlassCard>
+      </motion.div>
+
+      {/* Streak History */}
+      <motion.div variants={itemVariants}>
+        <GlassCard className="!p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-secondary" />
+              <h3 className="font-semibold text-foreground text-sm">{t('streakHistory')}</h3>
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {weeklyStreakDays}/7 {t('days')}
+            </span>
+          </div>
+          
+          <div className="flex items-center justify-between gap-2">
+            {streakHistory.map((day, index) => (
+              <div key={index} className="flex flex-col items-center gap-1.5 flex-1">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2 + index * 0.05, duration: 0.2, ease: 'easeOut' }}
+                  className={cn(
+                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium",
+                    day.hasActivity 
+                      ? "bg-gradient-to-br from-secondary to-orange-500 text-white" 
+                      : "bg-muted text-muted-foreground",
+                    day.isToday && "ring-2 ring-primary ring-offset-2 ring-offset-background"
+                  )}
+                >
+                  {day.hasActivity ? '🔥' : day.completed}
+                </motion.div>
+                <span className={cn(
+                  "text-[9px]",
+                  day.isToday ? "text-primary font-medium" : "text-muted-foreground"
+                )}>
+                  {day.day}
+                </span>
+              </div>
+            ))}
+          </div>
         </GlassCard>
       </motion.div>
 
