@@ -185,10 +185,10 @@ export const SettingsPage = ({
     return (
       <motion.div
         key="software"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
         className="space-y-5"
       >
         <BackButton title={t('software')} />
@@ -229,10 +229,10 @@ export const SettingsPage = ({
     return (
       <motion.div
         key="appearance"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
         className="space-y-5"
       >
         <BackButton title={t('appearance')} />
@@ -304,10 +304,10 @@ export const SettingsPage = ({
     return (
       <motion.div
         key="customization"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
         className="space-y-5"
       >
         <BackButton title={t('customization')} />
@@ -483,10 +483,10 @@ export const SettingsPage = ({
     return (
       <motion.div
         key="privacy"
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.22, ease: 'easeOut' }}
         className="space-y-5"
       >
         <BackButton title={t('privacyData')} />
@@ -537,7 +537,7 @@ export const SettingsPage = ({
       key="settings-main"
       initial="hidden"
       animate="visible"
-      exit={{ opacity: 0, x: 20 }}
+      exit={{ opacity: 0 }}
       variants={containerVariants}
       className="space-y-5"
     >
