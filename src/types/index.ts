@@ -93,6 +93,8 @@ export const MOOD_EMOJIS: Record<MoodType, string> = {
   terrible: '😢',
 };
 
+// Mood labels are now dynamically translated via t() function
+// This is kept for backwards compatibility but use t('amazing'), t('good'), etc.
 export const MOOD_LABELS: Record<MoodType, string> = {
   amazing: 'Amazing',
   good: 'Good',

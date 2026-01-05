@@ -138,7 +138,8 @@ export const TaskDetailSheet = ({
               stiffness: 350,
               mass: 0.8
             }}
-            className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-hidden"
+            style={{ paddingBottom: 'env(safe-area-inset-bottom, 100px)' }}
           >
             <div className="glass-card rounded-t-3xl max-h-[90vh] overflow-hidden flex flex-col">
               {/* Handle */}
@@ -353,7 +354,7 @@ export const TaskDetailSheet = ({
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 pb-6">
+                <div className="flex gap-3 pb-8 pt-4 border-t border-border/30 mt-6">
                   {onDuplicate && (
                     <motion.button
                       whileTap={{ scale: 0.95 }}

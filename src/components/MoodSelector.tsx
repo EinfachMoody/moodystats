@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
-import { MoodType, MOOD_EMOJIS, MOOD_LABELS } from '@/types';
+import { MoodType, MOOD_EMOJIS } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface MoodSelectorProps {
   selectedMood: MoodType | null;
   onSelect: (mood: MoodType) => void;
+  t?: (key: string) => string;
 }
 
 const moodGradients: Record<MoodType, string> = {
@@ -15,9 +16,23 @@ const moodGradients: Record<MoodType, string> = {
   terrible: 'from-rose-400 to-pink-400',
 };
 
+// Default fallback labels (used if t is not provided)
+const fallbackLabels: Record<MoodType, string> = {
+  amazing: 'Amazing',
+  good: 'Good',
+  okay: 'Okay',
+  bad: 'Bad',
+  terrible: 'Terrible',
+};
+
 const moods: MoodType[] = ['terrible', 'bad', 'okay', 'good', 'amazing'];
 
-export const MoodSelector = ({ selectedMood, onSelect }: MoodSelectorProps) => {
+export const MoodSelector = ({ selectedMood, onSelect, t }: MoodSelectorProps) => {
+  const getMoodLabel = (mood: MoodType) => {
+    if (t) return t(mood);
+    return fallbackLabels[mood];
+  };
+
   return (
     <div className="flex items-center justify-center gap-3">
       {moods.map((mood, index) => (
@@ -41,7 +56,7 @@ export const MoodSelector = ({ selectedMood, onSelect }: MoodSelectorProps) => {
             'text-xs font-medium',
             selectedMood === mood ? 'text-white' : 'text-muted-foreground'
           )}>
-            {MOOD_LABELS[mood]}
+            {getMoodLabel(mood)}
           </span>
           
           {selectedMood === mood && (

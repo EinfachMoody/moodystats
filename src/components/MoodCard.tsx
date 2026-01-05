@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MoodEntry, MOOD_EMOJIS, MOOD_LABELS } from '@/types';
+import { MoodEntry, MOOD_EMOJIS, MoodType } from '@/types';
 import { format } from 'date-fns';
 import { enUS, Locale } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
@@ -8,9 +8,10 @@ interface MoodCardProps {
   entry: MoodEntry;
   index?: number;
   locale?: Locale;
+  t?: (key: string) => string;
 }
 
-const moodGradients: Record<MoodEntry['mood'], string> = {
+const moodGradients: Record<MoodType, string> = {
   amazing: 'mood-amazing',
   good: 'mood-good',
   okay: 'mood-okay',
@@ -18,7 +19,21 @@ const moodGradients: Record<MoodEntry['mood'], string> = {
   terrible: 'mood-terrible',
 };
 
-export const MoodCard = ({ entry, index = 0, locale = enUS }: MoodCardProps) => {
+// Default fallback labels (used if t is not provided)
+const fallbackLabels: Record<MoodType, string> = {
+  amazing: 'Amazing',
+  good: 'Good',
+  okay: 'Okay',
+  bad: 'Bad',
+  terrible: 'Terrible',
+};
+
+export const MoodCard = ({ entry, index = 0, locale = enUS, t }: MoodCardProps) => {
+  const getMoodLabel = (mood: MoodType) => {
+    if (t) return t(mood);
+    return fallbackLabels[mood];
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -41,7 +56,7 @@ export const MoodCard = ({ entry, index = 0, locale = enUS }: MoodCardProps) => 
         
         <div className="flex-1">
           <p className="font-medium text-foreground/90">
-            {MOOD_LABELS[entry.mood]}
+            {getMoodLabel(entry.mood)}
           </p>
           <p className="text-xs text-foreground/60">
             {format(new Date(entry.date), 'EEEE, MMM d', { locale })}
