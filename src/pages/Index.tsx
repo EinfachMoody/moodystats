@@ -352,15 +352,15 @@ const Index = () => {
     return labels[cat] || cat;
   };
 
-  // Layout padding based on nav position
+  // Layout padding based on nav position - improved spacing for all positions
   const getLayoutClasses = () => {
     switch (appSettings.navPosition) {
       case 'top':
-        return 'pt-24 pb-6';
+        return 'pt-24 pb-8';
       case 'left':
-        return 'pl-24 pr-4 pt-6 pb-6';
+        return 'pl-28 pr-6 pt-8 pb-8';
       case 'right':
-        return 'pr-24 pl-4 pt-6 pb-6';
+        return 'pr-28 pl-6 pt-8 pb-8';
       default: // bottom
         return 'pb-28 pt-6';
     }
@@ -543,7 +543,7 @@ const Index = () => {
                     </motion.span>
                   )}
                 </div>
-                <MoodSelector selectedMood={todayMood} onSelect={handleMoodSelect} />
+                <MoodSelector selectedMood={todayMood} onSelect={handleMoodSelect} t={t} />
               </GlassCard>
 
               {/* Today's Tasks */}
@@ -605,7 +605,7 @@ const Index = () => {
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
                     {moods.slice(0, 4).map((entry, index) => (
-                      <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} />
+                      <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} t={t} />
                     ))}
                   </div>
                 </div>
@@ -839,15 +839,54 @@ const Index = () => {
 
               <GlassCard className="!p-5">
                 <h3 className="font-semibold text-foreground mb-4 text-sm">{t('todaysMood')}</h3>
-                <MoodSelector selectedMood={todayMood} onSelect={handleMoodSelect} />
+                <MoodSelector selectedMood={todayMood} onSelect={handleMoodSelect} t={t} />
               </GlassCard>
 
+              {/* Mood Overview/Trend */}
+              {moods.length >= 3 && (
+                <GlassCard className="!p-4">
+                  <h3 className="font-semibold text-foreground mb-3 text-sm flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-primary" />
+                    {t('moodOverview')}
+                  </h3>
+                  <div className="flex items-end justify-between gap-2 h-20">
+                    {moods.slice(0, 7).reverse().map((mood, index) => {
+                      const moodHeight: Record<string, number> = {
+                        amazing: 100, good: 80, okay: 60, bad: 40, terrible: 20
+                      };
+                      return (
+                        <motion.div
+                          key={mood.id}
+                          initial={{ height: 0 }}
+                          animate={{ height: `${moodHeight[mood.mood]}%` }}
+                          transition={{ delay: index * 0.05, duration: 0.3, ease: 'easeOut' }}
+                          className={cn(
+                            "flex-1 rounded-lg flex items-end justify-center pb-1",
+                            mood.mood === 'amazing' && "bg-gradient-to-t from-emerald-500 to-emerald-300",
+                            mood.mood === 'good' && "bg-gradient-to-t from-sky-500 to-sky-300",
+                            mood.mood === 'okay' && "bg-gradient-to-t from-amber-500 to-amber-300",
+                            mood.mood === 'bad' && "bg-gradient-to-t from-orange-500 to-orange-300",
+                            mood.mood === 'terrible' && "bg-gradient-to-t from-rose-500 to-rose-300"
+                          )}
+                        >
+                          <span className="text-xs">{MOOD_EMOJIS[mood.mood]}</span>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground text-center mt-2">
+                    {t('recentMoods')} ({moods.length} {t('days').toLowerCase()})
+                  </p>
+                </GlassCard>
+              )}
+
+              {/* Mood History */}
               <div>
                 <h3 className="font-semibold text-foreground mb-3 text-sm">{t('moodHistory')}</h3>
                 {moods.length > 0 ? (
                   <div className="space-y-2">
                     {moods.map((entry, index) => (
-                      <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} />
+                      <MoodCard key={entry.id} entry={entry} index={index} locale={dateLocale} t={t} />
                     ))}
                   </div>
                 ) : (

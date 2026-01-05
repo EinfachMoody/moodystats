@@ -262,6 +262,8 @@ export const translations = {
     topCategory: 'Top Category',
     streakHistory: 'Streak History',
     focusQuote: 'Focus Rate',
+    onTimePerformance: 'On-Time Performance',
+    onTime: 'On time',
     
     // Quick Actions
     quickActions: 'Quick Actions',
@@ -489,6 +491,8 @@ export const translations = {
     topCategory: 'Top-Kategorie',
     streakHistory: 'Streak-Verlauf',
     focusQuote: 'Fokus-Quote',
+    onTimePerformance: 'Pünktlichkeit',
+    onTime: 'Pünktlich',
     
     // Quick Actions
     quickActions: 'Schnellaktionen',
@@ -712,6 +716,11 @@ export const translations = {
     weeklyGoal: 'Objectif hebdo',
     monthlyProgress: 'Progrès mensuel',
     insights: 'Insights',
+    onTimePerformance: 'Performance ponctuelle',
+    onTime: 'À temps',
+    topCategory: 'Top catégorie',
+    streakHistory: 'Historique série',
+    focusQuote: 'Taux de focus',
     
     quickActions: 'Actions rapides',
     markComplete: 'Terminer',
@@ -934,6 +943,11 @@ export const translations = {
     weeklyGoal: 'Meta semanal',
     monthlyProgress: 'Progreso mensual',
     insights: 'Insights',
+    onTimePerformance: 'Rendimiento puntual',
+    onTime: 'A tiempo',
+    topCategory: 'Top categoría',
+    streakHistory: 'Historial de racha',
+    focusQuote: 'Tasa de enfoque',
     
     quickActions: 'Acciones rápidas',
     markComplete: 'Completar',
@@ -1156,6 +1170,11 @@ export const translations = {
     weeklyGoal: 'Obiettivo settimanale',
     monthlyProgress: 'Progresso mensile',
     insights: 'Insights',
+    onTimePerformance: 'Prestazioni puntuali',
+    onTime: 'In tempo',
+    topCategory: 'Top categoria',
+    streakHistory: 'Storia serie',
+    focusQuote: 'Tasso focus',
     
     quickActions: 'Azioni rapide',
     markComplete: 'Completa',
@@ -1378,6 +1397,11 @@ export const translations = {
     weeklyGoal: 'Weekdoel',
     monthlyProgress: 'Maandelijkse voortgang',
     insights: 'Inzichten',
+    onTimePerformance: 'Op-tijd prestatie',
+    onTime: 'Op tijd',
+    topCategory: 'Top categorie',
+    streakHistory: 'Reeks geschiedenis',
+    focusQuote: 'Focus percentage',
     
     quickActions: 'Snelle acties',
     markComplete: 'Voltooien',
@@ -1599,6 +1623,11 @@ export const translations = {
     weeklyGoal: 'Meta semanal',
     monthlyProgress: 'Progresso mensal',
     insights: 'Insights',
+    onTimePerformance: 'Desempenho pontual',
+    onTime: 'No prazo',
+    topCategory: 'Top categoria',
+    streakHistory: 'Histórico de sequência',
+    focusQuote: 'Taxa de foco',
     
     quickActions: 'Ações rápidas',
     markComplete: 'Concluir',
@@ -1820,6 +1849,11 @@ export const translations = {
     weeklyGoal: 'Cel tygodniowy',
     monthlyProgress: 'Postęp miesięczny',
     insights: 'Wnioski',
+    onTimePerformance: 'Wydajność punktualna',
+    onTime: 'Na czas',
+    topCategory: 'Top kategoria',
+    streakHistory: 'Historia serii',
+    focusQuote: 'Współczynnik fokus',
     
     quickActions: 'Szybkie akcje',
     markComplete: 'Ukończ',
@@ -2041,6 +2075,11 @@ export const translations = {
     weeklyGoal: 'Haftalık hedef',
     monthlyProgress: 'Aylık ilerleme',
     insights: 'İçgörüler',
+    onTimePerformance: 'Zamanında performans',
+    onTime: 'Zamanında',
+    topCategory: 'En iyi kategori',
+    streakHistory: 'Seri geçmişi',
+    focusQuote: 'Odak oranı',
     
     quickActions: 'Hızlı eylemler',
     markComplete: 'Tamamla',

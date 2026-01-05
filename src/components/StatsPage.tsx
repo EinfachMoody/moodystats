@@ -438,12 +438,12 @@ export const StatsPage = ({
       {/* NEW: On-Time Performance */}
       <motion.div variants={itemVariants}>
         <GlassCard className="!p-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Brain className="w-4 h-4 text-indigo-500" />
-              <h3 className="font-semibold text-foreground text-sm">On-Time Performance</h3>
+          <div className="flex items-center justify-between mb-3 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <Brain className="w-4 h-4 text-indigo-500 flex-shrink-0" />
+              <h3 className="font-semibold text-foreground text-sm truncate">{t('onTimePerformance')}</h3>
             </div>
-            <span className="text-xs font-medium text-primary">{onTimeRate}%</span>
+            <span className="text-xs font-medium text-primary flex-shrink-0">{onTimeRate}%</span>
           </div>
           <div className="flex gap-2 mb-2">
             <div className="flex-1">
@@ -458,8 +458,8 @@ export const StatsPage = ({
             </div>
           </div>
           <div className="flex justify-between text-[10px] text-muted-foreground">
-            <span>✅ On time: {onTimeTasks}</span>
-            <span>⚠️ Overdue: {overdueTasks}</span>
+            <span>✅ {t('onTime')}: {onTimeTasks}</span>
+            <span>⚠️ {t('overdue')}: {overdueTasks}</span>
           </div>
         </GlassCard>
       </motion.div>
