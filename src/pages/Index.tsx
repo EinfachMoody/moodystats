@@ -25,12 +25,13 @@ import { PointsAnimation } from '@/components/PointsAnimation';
 import { FloatingActionButton } from '@/components/FloatingActionButton';
 import { SettingsPage } from '@/components/SettingsPage';
 import { CalendarView } from '@/components/CalendarView';
+import { AddEventDialog } from '@/components/AddEventDialog';
 import { StatsPage } from '@/components/StatsPage';
 import { UndoToast } from '@/components/UndoToast';
 import { FocusTasks } from '@/components/FocusTasks';
 import { PageManager } from '@/components/PageManager';
 import { TaskDetailSheet } from '@/components/TaskDetailSheet';
-import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS, TaskPage, AppSettings, DEFAULT_SETTINGS } from '@/types';
+import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS, TaskPage, AppSettings, DEFAULT_SETTINGS, CalendarEvent } from '@/types';
 import { Language } from '@/i18n/translations';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -43,10 +44,12 @@ const Index = () => {
   
   // Persistent state with localStorage
   const [tasks, setTasks] = useLocalStorage<Task[]>('dailyflow-tasks', []);
+  const [events, setEvents] = useLocalStorage<CalendarEvent[]>('dailyflow-events', []);
   const [moods, setMoods] = useLocalStorage<MoodEntry[]>('dailyflow-moods', []);
   const [journalEntries, setJournalEntries] = useLocalStorage<JournalEntry[]>('dailyflow-journal', []);
   const [totalPoints, setTotalPoints] = useLocalStorage<number>('dailyflow-points', 0);
   const [streak, setStreak] = useLocalStorage<number>('dailyflow-streak', 0);
+  const [lastCompletionDate, setLastCompletionDate] = useLocalStorage<string>('dailyflow-lastCompletion', '');
   const [taskPages, setTaskPages] = useLocalStorage<TaskPage[]>('dailyflow-pages', []);
   const [appSettings, setAppSettings] = useLocalStorage<AppSettings>('dailyflow-settings', DEFAULT_SETTINGS);
   
@@ -60,6 +63,7 @@ const Index = () => {
   // Non-persistent UI state
   const [todayMood, setTodayMood] = useState<MoodType | null>(null);
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
+  const [isAddEventOpen, setIsAddEventOpen] = useState(false);
   const [showPoints, setShowPoints] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [journalText, setJournalText] = useState('');
@@ -160,12 +164,34 @@ const Index = () => {
     return tasks.filter(t => t.category === filterCategory);
   }, [tasks, selectedPageId, filterCategory]);
 
+  // Improved streak tracking
+  const updateStreak = useCallback(() => {
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const yesterday = format(new Date(Date.now() - 86400000), 'yyyy-MM-dd');
+    
+    if (lastCompletionDate === today) {
+      // Already completed something today, streak maintained
+      return;
+    } else if (lastCompletionDate === yesterday) {
+      // Completed yesterday, increment streak
+      setStreak(prev => prev + 1);
+    } else if (lastCompletionDate === '') {
+      // First completion ever
+      setStreak(1);
+    } else {
+      // Streak broken, restart
+      setStreak(1);
+    }
+    setLastCompletionDate(today);
+  }, [lastCompletionDate, setStreak, setLastCompletionDate]);
+
   const handleCompleteTask = useCallback((id: string) => {
     setTasks(prev => prev.map(task => {
       if (task.id === id && !task.completed) {
         setEarnedPoints(task.points);
         setShowPoints(true);
         setTotalPoints(p => p + task.points);
+        updateStreak();
         return { ...task, completed: true, completedAt: new Date() };
       }
       if (task.id === id && task.completed) {
@@ -174,7 +200,7 @@ const Index = () => {
       }
       return task;
     }));
-  }, [setTasks, setTotalPoints]);
+  }, [setTasks, setTotalPoints, updateStreak]);
 
   const handleDeleteTask = useCallback((id: string) => {
     const taskToDelete = tasks.find(t => t.id === id);
@@ -279,6 +305,16 @@ const Index = () => {
     setJournalEntries(prev => [newEntry, ...prev]);
     setJournalText('');
   }, [journalText, setJournalEntries]);
+
+  const handleAddEvent = useCallback((event: Omit<CalendarEvent, 'id' | 'type'>) => {
+    const newEvent: CalendarEvent = {
+      ...event,
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      type: 'event',
+    };
+    setEvents(prev => [...prev, newEvent]);
+    setIsAddEventOpen(false);
+  }, [setEvents]);
 
   const handleAddPage = useCallback((page: Omit<TaskPage, 'id' | 'order' | 'createdAt'>) => {
     const newPage: TaskPage = {
@@ -415,6 +451,14 @@ const Index = () => {
         onAdd={handleAddTask}
         t={t}
         language={language}
+      />
+
+      {/* Add Event Dialog */}
+      <AddEventDialog
+        isOpen={isAddEventOpen}
+        onClose={() => setIsAddEventOpen(false)}
+        onAdd={handleAddEvent}
+        t={t}
       />
 
       {/* Task Detail Sheet */}
@@ -798,9 +842,11 @@ const Index = () => {
             >
               <CalendarView
                 tasks={tasks}
+                events={events}
                 language={language}
                 t={t}
                 onAddTask={() => setIsAddTaskOpen(true)}
+                onAddEvent={() => setIsAddEventOpen(true)}
                 onSelectTask={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
               />
             </motion.div>
