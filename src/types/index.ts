@@ -64,6 +64,22 @@ export const REPEAT_LABELS: Record<RepeatType, string> = {
   monthly: 'Monthly',
 };
 
+// Calendar Event Type
+export type CalendarItemType = 'task' | 'event' | 'reminder';
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date: Date;
+  startTime?: string; // HH:mm format
+  endTime?: string;   // HH:mm format
+  isAllDay: boolean;
+  repeat: RepeatType;
+  category: TaskCategory;
+  type: 'event';
+}
+
 export interface MoodEntry {
   id: string;
   date: Date;
