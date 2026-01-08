@@ -299,181 +299,224 @@ export const SettingsPage = ({
     );
   }
 
-  // Customization View
+  // Customization View - with optimized animations
   if (currentView === 'customization') {
+    const buttonTransition = { duration: 0.15, ease: 'easeOut' as const };
+    
     return (
       <motion.div
         key="customization"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.22, ease: 'easeOut' }}
+        transition={{ duration: 0.2, ease: 'easeOut' }}
         className="space-y-5"
       >
         <BackButton title={t('customization')} />
         <h1 className="text-xl font-bold text-foreground">{t('customization')}</h1>
 
         {/* Layout & View */}
-        <GlassCard className="!p-0 overflow-hidden">
-          <div className="settings-group-header">
-            <span className="settings-group-title">{t('layoutView')}</span>
-          </div>
-          <div className="p-5 space-y-4">
-            <p className="text-xs text-muted-foreground mb-3">{t('taskViewMode')}</p>
-            <div className="flex gap-3">
-              {(['compact', 'standard', 'cards'] as TaskViewMode[]).map((mode) => (
-                <motion.button
-                  key={mode}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => onSettingsChange({ taskViewMode: mode })}
-                  className={cn(
-                    "flex-1 py-4 rounded-2xl text-sm font-medium transition-all flex flex-col items-center gap-2 min-h-[72px]",
-                    appSettings.taskViewMode === mode
-                      ? 'bg-primary text-primary-foreground shadow-lg'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                  )}
-                >
-                  {mode === 'compact' && <LayoutList className="w-5 h-5" />}
-                  {mode === 'standard' && <LayoutList className="w-5 h-5" />}
-                  {mode === 'cards' && <LayoutGrid className="w-5 h-5" />}
-                  <span className="text-xs">{t(mode)}</span>
-                </motion.button>
-              ))}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.05, duration: 0.2 }}
+        >
+          <GlassCard className="!p-0 overflow-hidden">
+            <div className="settings-group-header">
+              <span className="settings-group-title">{t('layoutView')}</span>
             </div>
-          </div>
-        </GlassCard>
-
-        {/* Size & Density */}
-        <GlassCard className="!p-0 overflow-hidden">
-          <div className="settings-group-header">
-            <span className="settings-group-title">{t('sizeDensity')}</span>
-          </div>
-          <div className="p-5 space-y-5">
-            <div>
-              <p className="text-xs text-muted-foreground mb-3">{t('textSize')}</p>
+            <div className="p-5 space-y-4">
+              <p className="text-xs text-muted-foreground mb-3">{t('taskViewMode')}</p>
               <div className="flex gap-3">
-                {(['small', 'normal', 'large'] as TextSize[]).map((size) => (
+                {(['compact', 'standard', 'cards'] as TaskViewMode[]).map((mode) => (
                   <motion.button
-                    key={size}
+                    key={mode}
                     whileTap={{ scale: 0.97 }}
-                    onClick={() => onSettingsChange({ textSize: size })}
+                    transition={buttonTransition}
+                    onClick={() => onSettingsChange({ taskViewMode: mode })}
                     className={cn(
-                      "flex-1 py-3.5 rounded-2xl font-medium transition-all min-h-[52px]",
-                      appSettings.textSize === size
-                        ? 'bg-primary text-primary-foreground shadow-lg'
-                        : 'bg-muted/50 text-muted-foreground hover:bg-muted',
-                      size === 'small' && 'text-xs',
-                      size === 'normal' && 'text-sm',
-                      size === 'large' && 'text-base'
-                    )}
-                  >
-                    A
-                  </motion.button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground mb-3">{t('uiDensity')}</p>
-              <div className="flex gap-3">
-                {(['compact', 'normal'] as UIDensity[]).map((density) => (
-                  <motion.button
-                    key={density}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => onSettingsChange({ uiDensity: density })}
-                    className={cn(
-                      "flex-1 py-3.5 rounded-2xl text-sm font-medium transition-all min-h-[52px]",
-                      appSettings.uiDensity === density
+                      "flex-1 py-4 rounded-2xl text-sm font-medium flex flex-col items-center gap-2 min-h-[72px]",
+                      appSettings.taskViewMode === mode
                         ? 'bg-primary text-primary-foreground shadow-lg'
                         : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                     )}
+                    style={{ transition: 'background-color 0.15s ease-out, color 0.15s ease-out' }}
                   >
-                    {t(density)}
+                    {mode === 'compact' && <LayoutList className="w-5 h-5" />}
+                    {mode === 'standard' && <LayoutList className="w-5 h-5" />}
+                    {mode === 'cards' && <LayoutGrid className="w-5 h-5" />}
+                    <span className="text-xs">{t(mode)}</span>
                   </motion.button>
                 ))}
               </div>
             </div>
-          </div>
-        </GlassCard>
+          </GlassCard>
+        </motion.div>
+
+        {/* Size & Density */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.2 }}
+        >
+          <GlassCard className="!p-0 overflow-hidden">
+            <div className="settings-group-header">
+              <span className="settings-group-title">{t('sizeDensity')}</span>
+            </div>
+            <div className="p-5 space-y-5">
+              <div>
+                <p className="text-xs text-muted-foreground mb-3">{t('textSize')}</p>
+                <div className="flex gap-3">
+                  {(['small', 'normal', 'large'] as TextSize[]).map((size) => (
+                    <motion.button
+                      key={size}
+                      whileTap={{ scale: 0.97 }}
+                      transition={buttonTransition}
+                      onClick={() => onSettingsChange({ textSize: size })}
+                      className={cn(
+                        "flex-1 py-3.5 rounded-2xl font-medium min-h-[52px]",
+                        appSettings.textSize === size
+                          ? 'bg-primary text-primary-foreground shadow-lg'
+                          : 'bg-muted/50 text-muted-foreground hover:bg-muted',
+                        size === 'small' && 'text-xs',
+                        size === 'normal' && 'text-sm',
+                        size === 'large' && 'text-base'
+                      )}
+                      style={{ transition: 'background-color 0.15s ease-out, color 0.15s ease-out' }}
+                    >
+                      A
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-3">{t('uiDensity')}</p>
+                <div className="flex gap-3">
+                  {(['compact', 'normal'] as UIDensity[]).map((density) => (
+                    <motion.button
+                      key={density}
+                      whileTap={{ scale: 0.97 }}
+                      transition={buttonTransition}
+                      onClick={() => onSettingsChange({ uiDensity: density })}
+                      className={cn(
+                        "flex-1 py-3.5 rounded-2xl text-sm font-medium min-h-[52px]",
+                        appSettings.uiDensity === density
+                          ? 'bg-primary text-primary-foreground shadow-lg'
+                          : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                      )}
+                      style={{ transition: 'background-color 0.15s ease-out, color 0.15s ease-out' }}
+                    >
+                      {t(density)}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
 
         {/* Colors & Accents */}
-        <GlassCard className="!p-0 overflow-hidden">
-          <div className="settings-group-header">
-            <span className="settings-group-title">{t('colorsAccents')}</span>
-          </div>
-          <SettingsRow 
-            icon={Palette} 
-            label={t('accentColor')} 
-            onClick={() => setShowColorPicker(true)}
-          >
-            <div 
-              className="w-6 h-6 rounded-full border-2 border-border"
-              style={{ backgroundColor: appSettings.accentColor }}
-            />
-          </SettingsRow>
-        </GlassCard>
-
-        {/* Navigation Position - bessere Touch-Zonen */}
-        <GlassCard className="!p-0 overflow-hidden">
-          <div className="settings-group-header">
-            <span className="settings-group-title">{t('navPosition')}</span>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-2 gap-3">
-              {(['bottom', 'top', 'left', 'right'] as const).map((pos) => (
-                <motion.button
-                  key={pos}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => onSettingsChange({ navPosition: pos })}
-                  className={cn(
-                    "py-4 rounded-2xl text-sm font-medium transition-all flex items-center justify-center gap-2 min-h-[56px]",
-                    appSettings.navPosition === pos
-                      ? 'bg-primary text-primary-foreground shadow-lg'
-                      : 'bg-muted/50 text-muted-foreground hover:bg-muted'
-                  )}
-                >
-                  {t(pos)}
-                </motion.button>
-              ))}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15, duration: 0.2 }}
+        >
+          <GlassCard className="!p-0 overflow-hidden">
+            <div className="settings-group-header">
+              <span className="settings-group-title">{t('colorsAccents')}</span>
             </div>
-          </div>
-        </GlassCard>
+            <SettingsRow 
+              icon={Palette} 
+              label={t('accentColor')} 
+              onClick={() => setShowColorPicker(true)}
+            >
+              <div 
+                className="w-6 h-6 rounded-full border-2 border-border"
+                style={{ backgroundColor: appSettings.accentColor }}
+              />
+            </SettingsRow>
+          </GlassCard>
+        </motion.div>
+
+        {/* Navigation Position */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.2 }}
+        >
+          <GlassCard className="!p-0 overflow-hidden">
+            <div className="settings-group-header">
+              <span className="settings-group-title">{t('navPosition')}</span>
+            </div>
+            <div className="p-5">
+              <div className="grid grid-cols-2 gap-3">
+                {(['bottom', 'top', 'left', 'right'] as const).map((pos) => (
+                  <motion.button
+                    key={pos}
+                    whileTap={{ scale: 0.97 }}
+                    transition={buttonTransition}
+                    onClick={() => onSettingsChange({ navPosition: pos })}
+                    className={cn(
+                      "py-4 rounded-2xl text-sm font-medium flex items-center justify-center gap-2 min-h-[56px]",
+                      appSettings.navPosition === pos
+                        ? 'bg-primary text-primary-foreground shadow-lg'
+                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                    )}
+                    style={{ transition: 'background-color 0.15s ease-out, color 0.15s ease-out' }}
+                  >
+                    {t(pos)}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+          </GlassCard>
+        </motion.div>
 
         {/* Reset Options */}
-        <GlassCard className="!p-0 overflow-hidden">
-          <div className="settings-group-header">
-            <span className="settings-group-title">{t('resetOptions')}</span>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onResetSettings('colors')}
-            className="w-full settings-row settings-row-clickable"
-          >
-            <div className="flex items-center gap-3">
-              <Palette className="w-5 h-5 text-muted-foreground" />
-              <span className="text-sm text-foreground">{t('resetColors')}</span>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25, duration: 0.2 }}
+        >
+          <GlassCard className="!p-0 overflow-hidden">
+            <div className="settings-group-header">
+              <span className="settings-group-title">{t('resetOptions')}</span>
             </div>
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onResetSettings('layout')}
-            className="w-full settings-row settings-row-clickable"
-          >
-            <div className="flex items-center gap-3">
-              <LayoutGrid className="w-5 h-5 text-muted-foreground" />
-              <span className="text-sm text-foreground">{t('resetLayout')}</span>
-            </div>
-          </motion.button>
-          <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onResetSettings('all')}
-            className="w-full settings-row settings-row-clickable"
-          >
-            <div className="flex items-center gap-3">
-              <RefreshCw className="w-5 h-5 text-destructive" />
-              <span className="text-sm text-destructive font-medium">{t('resetAll')}</span>
-            </div>
-          </motion.button>
-        </GlassCard>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              transition={buttonTransition}
+              onClick={() => onResetSettings('colors')}
+              className="w-full settings-row settings-row-clickable"
+            >
+              <div className="flex items-center gap-3">
+                <Palette className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-foreground">{t('resetColors')}</span>
+              </div>
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              transition={buttonTransition}
+              onClick={() => onResetSettings('layout')}
+              className="w-full settings-row settings-row-clickable"
+            >
+              <div className="flex items-center gap-3">
+                <LayoutGrid className="w-5 h-5 text-muted-foreground" />
+                <span className="text-sm text-foreground">{t('resetLayout')}</span>
+              </div>
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              transition={buttonTransition}
+              onClick={() => onResetSettings('all')}
+              className="w-full settings-row settings-row-clickable"
+            >
+              <div className="flex items-center gap-3">
+                <RefreshCw className="w-5 h-5 text-destructive" />
+                <span className="text-sm text-destructive font-medium">{t('resetAll')}</span>
+              </div>
+            </motion.button>
+          </GlassCard>
+        </motion.div>
       </motion.div>
     );
   }

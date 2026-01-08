@@ -69,6 +69,20 @@ export interface MoodEntry {
   date: Date;
   mood: MoodType;
   note?: string;
+  completedTaskIds?: string[]; // Tasks completed on this day
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  date: Date;
+  startTime?: string;
+  endTime?: string;
+  isAllDay?: boolean;
+  location?: string;
+  reminder?: number;
+  color?: string;
 }
 
 export interface JournalEntry {
