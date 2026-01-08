@@ -265,20 +265,6 @@ export const translations = {
     onTimePerformance: 'On-Time Performance',
     onTime: 'On time',
     
-    // Events
-    event: 'Event',
-    events: 'Events',
-    addEvent: 'Add Event',
-    eventTitle: 'Event Title',
-    startTime: 'Start Time',
-    endTime: 'End Time',
-    allDay: 'All Day',
-    reminder: 'Reminder',
-    tasksLabel: 'Tasks',
-    eventsLabel: 'Events',
-    remindersLabel: 'Reminders',
-    noItemsToday: 'No items today',
-    
     // Quick Actions
     quickActions: 'Quick Actions',
     markComplete: 'Complete',
@@ -508,20 +494,6 @@ export const translations = {
     onTimePerformance: 'Pünktlichkeit',
     onTime: 'Pünktlich',
     
-    // Events
-    event: 'Termin',
-    events: 'Termine',
-    addEvent: 'Termin hinzufügen',
-    eventTitle: 'Terminname',
-    startTime: 'Startzeit',
-    endTime: 'Endzeit',
-    allDay: 'Ganztägig',
-    reminder: 'Erinnerung',
-    tasksLabel: 'Aufgaben',
-    eventsLabel: 'Termine',
-    remindersLabel: 'Erinnerungen',
-    noItemsToday: 'Keine Einträge heute',
-    
     // Quick Actions
     quickActions: 'Schnellaktionen',
     markComplete: 'Erledigen',
@@ -750,20 +722,6 @@ export const translations = {
     streakHistory: 'Historique série',
     focusQuote: 'Taux de focus',
     
-    // Events
-    event: 'Événement',
-    events: 'Événements',
-    addEvent: 'Ajouter un événement',
-    eventTitle: 'Titre de l\'événement',
-    startTime: 'Heure de début',
-    endTime: 'Heure de fin',
-    allDay: 'Toute la journée',
-    reminder: 'Rappel',
-    tasksLabel: 'Tâches',
-    eventsLabel: 'Événements',
-    remindersLabel: 'Rappels',
-    noItemsToday: 'Aucun élément aujourd\'hui',
-    
     quickActions: 'Actions rapides',
     markComplete: 'Terminer',
     editTask: 'Modifier',
@@ -990,20 +948,6 @@ export const translations = {
     topCategory: 'Top categoría',
     streakHistory: 'Historial de racha',
     focusQuote: 'Tasa de enfoque',
-    
-    // Events
-    event: 'Evento',
-    events: 'Eventos',
-    addEvent: 'Añadir evento',
-    eventTitle: 'Título del evento',
-    startTime: 'Hora de inicio',
-    endTime: 'Hora de fin',
-    allDay: 'Todo el día',
-    reminder: 'Recordatorio',
-    tasksLabel: 'Tareas',
-    eventsLabel: 'Eventos',
-    remindersLabel: 'Recordatorios',
-    noItemsToday: 'Sin elementos hoy',
     
     quickActions: 'Acciones rápidas',
     markComplete: 'Completar',
@@ -1232,20 +1176,6 @@ export const translations = {
     streakHistory: 'Storia serie',
     focusQuote: 'Tasso focus',
     
-    // Events
-    event: 'Evento',
-    events: 'Eventi',
-    addEvent: 'Aggiungi evento',
-    eventTitle: 'Titolo evento',
-    startTime: 'Ora di inizio',
-    endTime: 'Ora di fine',
-    allDay: 'Tutto il giorno',
-    reminder: 'Promemoria',
-    tasksLabel: 'Attività',
-    eventsLabel: 'Eventi',
-    remindersLabel: 'Promemoria',
-    noItemsToday: 'Nessun elemento oggi',
-    
     quickActions: 'Azioni rapide',
     markComplete: 'Completa',
     editTask: 'Modifica',
@@ -1473,20 +1403,6 @@ export const translations = {
     streakHistory: 'Reeks geschiedenis',
     focusQuote: 'Focus percentage',
     
-    // Events
-    event: 'Evenement',
-    events: 'Evenementen',
-    addEvent: 'Evenement toevoegen',
-    eventTitle: 'Evenementtitel',
-    startTime: 'Starttijd',
-    endTime: 'Eindtijd',
-    allDay: 'Hele dag',
-    reminder: 'Herinnering',
-    tasksLabel: 'Taken',
-    eventsLabel: 'Evenementen',
-    remindersLabel: 'Herinneringen',
-    noItemsToday: 'Geen items vandaag',
-    
     quickActions: 'Snelle acties',
     markComplete: 'Voltooien',
     editTask: 'Bewerken',
@@ -1712,20 +1628,6 @@ export const translations = {
     topCategory: 'Top categoria',
     streakHistory: 'Histórico de sequência',
     focusQuote: 'Taxa de foco',
-    
-    // Events
-    event: 'Evento',
-    events: 'Eventos',
-    addEvent: 'Adicionar evento',
-    eventTitle: 'Título do evento',
-    startTime: 'Hora de início',
-    endTime: 'Hora de término',
-    allDay: 'Dia inteiro',
-    reminder: 'Lembrete',
-    tasksLabel: 'Tarefas',
-    eventsLabel: 'Eventos',
-    remindersLabel: 'Lembretes',
-    noItemsToday: 'Sem itens hoje',
     
     quickActions: 'Ações rápidas',
     markComplete: 'Concluir',
@@ -1953,20 +1855,6 @@ export const translations = {
     streakHistory: 'Historia serii',
     focusQuote: 'Współczynnik fokus',
     
-    // Events
-    event: 'Wydarzenie',
-    events: 'Wydarzenia',
-    addEvent: 'Dodaj wydarzenie',
-    eventTitle: 'Tytuł wydarzenia',
-    startTime: 'Godzina rozpoczęcia',
-    endTime: 'Godzina zakończenia',
-    allDay: 'Cały dzień',
-    reminder: 'Przypomnienie',
-    tasksLabel: 'Zadania',
-    eventsLabel: 'Wydarzenia',
-    remindersLabel: 'Przypomnienia',
-    noItemsToday: 'Brak elementów dziś',
-    
     quickActions: 'Szybkie akcje',
     markComplete: 'Ukończ',
     editTask: 'Edytuj',
@@ -2192,20 +2080,6 @@ export const translations = {
     topCategory: 'En iyi kategori',
     streakHistory: 'Seri geçmişi',
     focusQuote: 'Odak oranı',
-    
-    // Events
-    event: 'Etkinlik',
-    events: 'Etkinlikler',
-    addEvent: 'Etkinlik ekle',
-    eventTitle: 'Etkinlik başlığı',
-    startTime: 'Başlangıç saati',
-    endTime: 'Bitiş saati',
-    allDay: 'Tüm gün',
-    reminder: 'Hatırlatma',
-    tasksLabel: 'Görevler',
-    eventsLabel: 'Etkinlikler',
-    remindersLabel: 'Hatırlatmalar',
-    noItemsToday: 'Bugün öğe yok',
     
     quickActions: 'Hızlı eylemler',
     markComplete: 'Tamamla',

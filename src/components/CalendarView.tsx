@@ -4,10 +4,7 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Calendar as CalendarIcon,
-  Plus,
-  CheckSquare,
-  CalendarDays,
-  Bell
+  Plus
 } from 'lucide-react';
 import { 
   format, 
@@ -23,27 +20,24 @@ import {
   addWeeks,
   subWeeks,
   isToday,
+  startOfDay,
   addDays
 } from 'date-fns';
 import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
 import { GlassCard } from './GlassCard';
-import { Task, CalendarEvent, CATEGORY_LABELS } from '@/types';
+import { Task, CATEGORY_LABELS } from '@/types';
 import { Language } from '@/i18n/translations';
 import { cn } from '@/lib/utils';
 
 interface CalendarViewProps {
   tasks: Task[];
-  events: CalendarEvent[];
   language: Language;
   t: (key: string) => string;
   onAddTask: () => void;
-  onAddEvent: () => void;
   onSelectTask: (task: Task) => void;
-  onSelectEvent?: (event: CalendarEvent) => void;
 }
 
 type ViewMode = 'month' | 'week' | 'day';
-type ItemFilter = 'all' | 'tasks' | 'events';
 
 const locales: Record<string, typeof enUS> = {
   de,
@@ -56,22 +50,17 @@ const locales: Record<string, typeof enUS> = {
 
 export const CalendarView = ({ 
   tasks, 
-  events,
   language, 
   t, 
   onAddTask,
-  onAddEvent,
-  onSelectTask,
-  onSelectEvent
+  onSelectTask 
 }: CalendarViewProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [itemFilter, setItemFilter] = useState<ItemFilter>('all');
-  const [showAddMenu, setShowAddMenu] = useState(false);
 
   const locale = locales[language] || enUS;
-  const isRTL = false;
+  const isRTL = false; // RTL disabled for now
 
   const days = useMemo(() => {
     if (viewMode === 'month') {
@@ -99,33 +88,7 @@ export const CalendarView = ({
     return tasks.filter(task => isSameDay(new Date(task.dueDate), date));
   };
 
-  const getEventsForDate = (date: Date) => {
-    return events.filter(event => isSameDay(new Date(event.date), date));
-  };
-
   const selectedDateTasks = getTasksForDate(selectedDate);
-  const selectedDateEvents = getEventsForDate(selectedDate);
-
-  const filteredItems = useMemo(() => {
-    const items: Array<{ type: 'task' | 'event'; data: Task | CalendarEvent }> = [];
-    
-    if (itemFilter === 'all' || itemFilter === 'tasks') {
-      selectedDateTasks.forEach(task => items.push({ type: 'task', data: task }));
-    }
-    if (itemFilter === 'all' || itemFilter === 'events') {
-      selectedDateEvents.forEach(event => items.push({ type: 'event', data: event }));
-    }
-    
-    return items.sort((a, b) => {
-      const aTime = a.type === 'task' 
-        ? (a.data as Task).dueTime || '23:59' 
-        : (a.data as CalendarEvent).startTime || '00:00';
-      const bTime = b.type === 'task' 
-        ? (b.data as Task).dueTime || '23:59' 
-        : (b.data as CalendarEvent).startTime || '00:00';
-      return aTime.localeCompare(bTime);
-    });
-  }, [selectedDateTasks, selectedDateEvents, itemFilter]);
 
   const navigate = (direction: 'prev' | 'next') => {
     if (viewMode === 'month') {
@@ -145,10 +108,6 @@ export const CalendarView = ({
       other: 'bg-muted-foreground',
     };
     return colors[category] || colors.other;
-  };
-
-  const getItemTypeIcon = (type: 'task' | 'event') => {
-    return type === 'task' ? CheckSquare : CalendarDays;
   };
 
   return (
@@ -199,6 +158,7 @@ export const CalendarView = ({
                 : format(currentDate, 'MMMM yyyy', { locale })
               }
             </h2>
+            {/* Today Button */}
             {!isToday(currentDate) && (
               <motion.button
                 whileTap={{ scale: 0.95 }}
@@ -245,11 +205,9 @@ export const CalendarView = ({
             >
               {days.map((day, index) => {
                 const dayTasks = getTasksForDate(day);
-                const dayEvents = getEventsForDate(day);
                 const isCurrentMonth = isSameMonth(day, currentDate);
                 const isSelected = isSameDay(day, selectedDate);
                 const isTodayDate = isToday(day);
-                const hasItems = dayTasks.length > 0 || dayEvents.length > 0;
 
                 return (
                   <motion.button
@@ -270,25 +228,14 @@ export const CalendarView = ({
                     )}>
                       {format(day, 'd')}
                     </span>
-                    {hasItems && (
+                    {dayTasks.length > 0 && (
                       <div className="flex gap-0.5 mt-1 flex-wrap justify-center">
-                        {/* Task indicators (squares) */}
-                        {dayTasks.slice(0, 2).map((task, i) => (
+                        {dayTasks.slice(0, 3).map((task, i) => (
                           <div
-                            key={`t-${i}`}
-                            className={cn(
-                              'w-1.5 h-1.5 rounded-sm',
-                              isSelected ? 'bg-primary-foreground/70' : getCategoryColor(task.category)
-                            )}
-                          />
-                        ))}
-                        {/* Event indicators (circles) */}
-                        {dayEvents.slice(0, 2).map((event, i) => (
-                          <div
-                            key={`e-${i}`}
+                            key={i}
                             className={cn(
                               'w-1.5 h-1.5 rounded-full',
-                              isSelected ? 'bg-primary-foreground/70' : 'bg-secondary'
+                              isSelected ? 'bg-primary-foreground/70' : getCategoryColor(task.category)
                             )}
                           />
                         ))}
@@ -310,10 +257,8 @@ export const CalendarView = ({
             >
               {days.map((day, index) => {
                 const dayTasks = getTasksForDate(day);
-                const dayEvents = getEventsForDate(day);
                 const isSelected = isSameDay(day, selectedDate);
                 const isTodayDate = isToday(day);
-                const totalItems = dayTasks.length + dayEvents.length;
 
                 return (
                   <motion.button
@@ -336,12 +281,12 @@ export const CalendarView = ({
                     )}>
                       {format(day, 'd')}
                     </span>
-                    {totalItems > 0 && (
+                    {dayTasks.length > 0 && (
                       <span className={cn(
                         'mt-1 text-xs px-2 py-0.5 rounded-full',
                         isSelected ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-primary/20 text-primary'
                       )}>
-                        {totalItems}
+                        {dayTasks.length}
                       </span>
                     )}
                   </motion.button>
@@ -352,188 +297,70 @@ export const CalendarView = ({
         </AnimatePresence>
       </GlassCard>
 
-      {/* Item Type Filter */}
-      <div className="flex gap-2">
-        {(['all', 'tasks', 'events'] as ItemFilter[]).map((filter) => (
-          <motion.button
-            key={filter}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setItemFilter(filter)}
-            className={cn(
-              'flex-1 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-center gap-1.5 min-h-[40px]',
-              itemFilter === filter
-                ? 'bg-primary/20 text-primary'
-                : 'bg-muted/30 text-muted-foreground'
-            )}
-          >
-            {filter === 'all' && t('all')}
-            {filter === 'tasks' && (
-              <>
-                <CheckSquare className="w-3 h-3" />
-                {t('tasksLabel')}
-              </>
-            )}
-            {filter === 'events' && (
-              <>
-                <CalendarDays className="w-3 h-3" />
-                {t('eventsLabel')}
-              </>
-            )}
-          </motion.button>
-        ))}
-      </div>
-
-      {/* Selected Date Items */}
+      {/* Selected Date Tasks */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-foreground text-sm flex items-center gap-2">
             <CalendarIcon className="w-4 h-4 text-primary" />
             {format(selectedDate, 'EEEE, d MMMM', { locale })}
           </h3>
-          <div className="relative">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAddMenu(!showAddMenu)}
-              className="p-2 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors"
-            >
-              <Plus className="w-4 h-4 text-primary" />
-            </motion.button>
-            
-            {/* Add Menu Dropdown */}
-            <AnimatePresence>
-              {showAddMenu && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -5 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -5 }}
-                  className="absolute right-0 top-full mt-2 z-50"
-                >
-                  <GlassCard className="!p-2 min-w-[140px]">
-                    <motion.button
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => { onAddTask(); setShowAddMenu(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted/50 text-sm text-foreground"
-                    >
-                      <CheckSquare className="w-4 h-4 text-primary" />
-                      {t('addTask')}
-                    </motion.button>
-                    <motion.button
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => { onAddEvent(); setShowAddMenu(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-muted/50 text-sm text-foreground"
-                    >
-                      <CalendarDays className="w-4 h-4 text-secondary" />
-                      {t('addEvent')}
-                    </motion.button>
-                  </GlassCard>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onAddTask}
+            className="p-2 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors"
+          >
+            <Plus className="w-4 h-4 text-primary" />
+          </motion.button>
         </div>
 
-        {filteredItems.length > 0 ? (
+        {selectedDateTasks.length > 0 ? (
           <div className="space-y-2">
-            {filteredItems.map((item, index) => {
-              const ItemIcon = getItemTypeIcon(item.type);
-              
-              if (item.type === 'task') {
-                const task = item.data as Task;
-                return (
-                  <motion.div
-                    key={`task-${task.id}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.04, duration: 0.18, ease: 'easeOut' }}
-                  >
-                    <GlassCard 
-                      className="!p-3 cursor-pointer"
-                      onClick={() => onSelectTask(task)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={cn(
-                          'w-3 h-3 rounded-sm',
-                          getCategoryColor(task.category)
-                        )} />
-                        <div className="flex-1 min-w-0">
-                          <p className={cn(
-                            'font-medium text-sm text-foreground truncate',
-                            task.completed && 'line-through opacity-60'
-                          )}>
-                            {task.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <CheckSquare className="w-3 h-3" />
-                            {task.dueTime || format(new Date(task.dueDate), 'HH:mm')}
-                          </p>
-                        </div>
-                        <span className={cn(
-                          'text-xs px-2 py-1 rounded-lg',
-                          task.priority === 'high' && 'bg-destructive/20 text-destructive',
-                          task.priority === 'medium' && 'bg-secondary/20 text-secondary',
-                          task.priority === 'low' && 'bg-accent/20 text-accent'
-                        )}>
-                          {t(task.priority)}
-                        </span>
-                      </div>
-                    </GlassCard>
-                  </motion.div>
-                );
-              } else {
-                const event = item.data as CalendarEvent;
-                return (
-                  <motion.div
-                    key={`event-${event.id}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.04, duration: 0.18, ease: 'easeOut' }}
-                  >
-                    <GlassCard 
-                      className="!p-3 cursor-pointer border-l-2 border-secondary"
-                      onClick={() => onSelectEvent?.(event)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-secondary" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-foreground truncate">
-                            {event.title}
-                          </p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1">
-                            <CalendarDays className="w-3 h-3" />
-                            {event.isAllDay 
-                              ? t('allDay')
-                              : `${event.startTime} - ${event.endTime}`
-                            }
-                          </p>
-                        </div>
-                        <span className="text-xs px-2 py-1 rounded-lg bg-secondary/20 text-secondary">
-                          {t('event')}
-                        </span>
-                      </div>
-                    </GlassCard>
-                  </motion.div>
-                );
-              }
-            })}
+            {selectedDateTasks.map((task, index) => (
+              <motion.div
+                key={task.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.04, duration: 0.18, ease: 'easeOut' }}
+              >
+                <GlassCard 
+                  className="!p-3 cursor-pointer"
+                  onClick={() => onSelectTask(task)}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      'w-3 h-3 rounded-full',
+                      getCategoryColor(task.category)
+                    )} />
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        'font-medium text-sm text-foreground truncate',
+                        task.completed && 'line-through opacity-60'
+                      )}>
+                        {task.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {task.dueTime || format(new Date(task.dueDate), 'HH:mm')}
+                      </p>
+                    </div>
+                    <span className={cn(
+                      'text-xs px-2 py-1 rounded-lg',
+                      task.priority === 'high' && 'bg-destructive/20 text-destructive',
+                      task.priority === 'medium' && 'bg-secondary/20 text-secondary',
+                      task.priority === 'low' && 'bg-accent/20 text-accent'
+                    )}>
+                      {task.priority}
+                    </span>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            ))}
           </div>
         ) : (
           <GlassCard className="!p-6 text-center">
             <CalendarIcon className="w-10 h-10 mx-auto mb-2 text-muted-foreground opacity-50" />
-            <p className="text-sm text-muted-foreground">{t('noItemsToday')}</p>
+            <p className="text-sm text-muted-foreground">{t('noEventsToday')}</p>
           </GlassCard>
         )}
-      </div>
-
-      {/* Legend */}
-      <div className="flex justify-center gap-4 text-xs text-muted-foreground">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-sm bg-primary" />
-          <span>{t('tasksLabel')}</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-secondary" />
-          <span>{t('eventsLabel')}</span>
-        </div>
       </div>
     </motion.div>
   );
