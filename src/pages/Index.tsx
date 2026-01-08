@@ -798,10 +798,13 @@ const Index = () => {
             >
               <CalendarView
                 tasks={tasks}
+                events={[]}
                 language={language}
                 t={t}
                 onAddTask={() => setIsAddTaskOpen(true)}
                 onSelectTask={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
+                onUpdateEvent={() => {}}
+                onDeleteEvent={() => {}}
               />
             </motion.div>
           )}

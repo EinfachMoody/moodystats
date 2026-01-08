@@ -4,7 +4,9 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Calendar as CalendarIcon,
-  Plus
+  Plus,
+  Circle,
+  Square
 } from 'lucide-react';
 import { 
   format, 
@@ -20,21 +22,24 @@ import {
   addWeeks,
   subWeeks,
   isToday,
-  startOfDay,
   addDays
 } from 'date-fns';
 import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
 import { GlassCard } from './GlassCard';
+import { EventDetailSheet, CalendarEvent } from './EventDetailSheet';
 import { Task, CATEGORY_LABELS } from '@/types';
 import { Language } from '@/i18n/translations';
 import { cn } from '@/lib/utils';
 
 interface CalendarViewProps {
   tasks: Task[];
+  events: CalendarEvent[];
   language: Language;
   t: (key: string) => string;
   onAddTask: () => void;
   onSelectTask: (task: Task) => void;
+  onUpdateEvent: (event: CalendarEvent) => void;
+  onDeleteEvent: (id: string) => void;
 }
 
 type ViewMode = 'month' | 'week' | 'day';
@@ -49,15 +54,20 @@ const locales: Record<string, typeof enUS> = {
 };
 
 export const CalendarView = ({ 
-  tasks, 
+  tasks,
+  events,
   language, 
   t, 
   onAddTask,
-  onSelectTask 
+  onSelectTask,
+  onUpdateEvent,
+  onDeleteEvent
 }: CalendarViewProps) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [showEventDetail, setShowEventDetail] = useState(false);
 
   const locale = locales[language] || enUS;
   const isRTL = false; // RTL disabled for now
@@ -88,7 +98,12 @@ export const CalendarView = ({
     return tasks.filter(task => isSameDay(new Date(task.dueDate), date));
   };
 
+  const getEventsForDate = (date: Date) => {
+    return events.filter(event => isSameDay(new Date(event.date), date));
+  };
+
   const selectedDateTasks = getTasksForDate(selectedDate);
+  const selectedDateEvents = getEventsForDate(selectedDate);
 
   const navigate = (direction: 'prev' | 'next') => {
     if (viewMode === 'month') {
@@ -297,7 +312,7 @@ export const CalendarView = ({
         </AnimatePresence>
       </GlassCard>
 
-      {/* Selected Date Tasks */}
+      {/* Selected Date Items */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-foreground text-sm flex items-center gap-2">
@@ -313,6 +328,36 @@ export const CalendarView = ({
           </motion.button>
         </div>
 
+        {/* Events */}
+        {selectedDateEvents.length > 0 && (
+          <div className="space-y-2 mb-3">
+            {selectedDateEvents.map((event, index) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.04, duration: 0.18, ease: 'easeOut' }}
+              >
+                <GlassCard 
+                  className="!p-3 cursor-pointer border-l-4 border-primary"
+                  onClick={() => { setSelectedEvent(event); setShowEventDetail(true); }}
+                >
+                  <div className="flex items-center gap-3">
+                    <Circle className="w-3 h-3 text-primary fill-primary" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm text-foreground truncate">{event.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {event.isAllDay ? t('allDay') : `${event.startTime || ''} - ${event.endTime || ''}`}
+                      </p>
+                    </div>
+                  </div>
+                </GlassCard>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
+        {/* Tasks */}
         {selectedDateTasks.length > 0 ? (
           <div className="space-y-2">
             {selectedDateTasks.map((task, index) => (
@@ -327,10 +372,7 @@ export const CalendarView = ({
                   onClick={() => onSelectTask(task)}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={cn(
-                      'w-3 h-3 rounded-full',
-                      getCategoryColor(task.category)
-                    )} />
+                    <Square className="w-3 h-3 text-muted-foreground" />
                     <div className="flex-1 min-w-0">
                       <p className={cn(
                         'font-medium text-sm text-foreground truncate',
@@ -355,13 +397,23 @@ export const CalendarView = ({
               </motion.div>
             ))}
           </div>
-        ) : (
+        ) : selectedDateEvents.length === 0 && (
           <GlassCard className="!p-6 text-center">
             <CalendarIcon className="w-10 h-10 mx-auto mb-2 text-muted-foreground opacity-50" />
             <p className="text-sm text-muted-foreground">{t('noEventsToday')}</p>
           </GlassCard>
         )}
       </div>
+
+      {/* Event Detail Sheet */}
+      <EventDetailSheet
+        event={selectedEvent}
+        isOpen={showEventDetail}
+        onClose={() => { setShowEventDetail(false); setSelectedEvent(null); }}
+        onSave={(updatedEvent) => { onUpdateEvent(updatedEvent); setShowEventDetail(false); setSelectedEvent(null); }}
+        onDelete={(id) => { onDeleteEvent(id); setShowEventDetail(false); setSelectedEvent(null); }}
+        t={t}
+      />
     </motion.div>
   );
 };

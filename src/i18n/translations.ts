@@ -265,6 +265,23 @@ export const translations = {
     onTimePerformance: 'On-Time Performance',
     onTime: 'On time',
     
+    // Mood enhancements
+    moodNote: 'Add a note about how you feel...',
+    tasksCompletedToday: 'tasks completed today',
+    saveMood: 'Save Mood',
+    more: 'more',
+    
+    // Event details
+    eventDetails: 'Event Details',
+    eventTitle: 'Event Title',
+    allDay: 'All Day',
+    startTime: 'Start Time',
+    endTime: 'End Time',
+    location: 'Location',
+    addLocation: 'Add location...',
+    editEvent: 'Edit Event',
+    deleteEvent: 'Delete Event',
+    
     // Quick Actions
     quickActions: 'Quick Actions',
     markComplete: 'Complete',
@@ -493,6 +510,23 @@ export const translations = {
     focusQuote: 'Fokus-Quote',
     onTimePerformance: 'Pünktlichkeit',
     onTime: 'Pünktlich',
+    
+    // Mood enhancements
+    moodNote: 'Füge eine Notiz hinzu...',
+    tasksCompletedToday: 'Aufgaben heute erledigt',
+    saveMood: 'Stimmung speichern',
+    more: 'weitere',
+    
+    // Event details
+    eventDetails: 'Event-Details',
+    eventTitle: 'Event-Titel',
+    allDay: 'Ganztägig',
+    startTime: 'Startzeit',
+    endTime: 'Endzeit',
+    location: 'Ort',
+    addLocation: 'Ort hinzufügen...',
+    editEvent: 'Event bearbeiten',
+    deleteEvent: 'Event löschen',
     
     // Quick Actions
     quickActions: 'Schnellaktionen',
