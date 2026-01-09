@@ -27,6 +27,7 @@ import {
 import { de, enUS, fr, es, it, nl } from 'date-fns/locale';
 import { GlassCard } from './GlassCard';
 import { EventDetailSheet, CalendarEvent } from './EventDetailSheet';
+import { AddEventDialog } from './AddEventDialog';
 import { Task, CATEGORY_LABELS } from '@/types';
 import { Language } from '@/i18n/translations';
 import { cn } from '@/lib/utils';
@@ -37,6 +38,7 @@ interface CalendarViewProps {
   language: Language;
   t: (key: string) => string;
   onAddTask: () => void;
+  onAddEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   onSelectTask: (task: Task) => void;
   onUpdateEvent: (event: CalendarEvent) => void;
   onDeleteEvent: (id: string) => void;
@@ -59,6 +61,7 @@ export const CalendarView = ({
   language, 
   t, 
   onAddTask,
+  onAddEvent,
   onSelectTask,
   onUpdateEvent,
   onDeleteEvent
@@ -68,6 +71,7 @@ export const CalendarView = ({
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [showEventDetail, setShowEventDetail] = useState(false);
+  const [showAddEvent, setShowAddEvent] = useState(false);
 
   const locale = locales[language] || enUS;
   const isRTL = false; // RTL disabled for now
@@ -319,13 +323,22 @@ export const CalendarView = ({
             <CalendarIcon className="w-4 h-4 text-primary" />
             {format(selectedDate, 'EEEE, d MMMM', { locale })}
           </h3>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={onAddTask}
-            className="p-2 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors"
-          >
-            <Plus className="w-4 h-4 text-primary" />
-          </motion.button>
+          <div className="flex gap-2">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddEvent(true)}
+              className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-medium"
+            >
+              + {t('addEvent')}
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={onAddTask}
+              className="p-2 rounded-xl bg-primary/10 hover:bg-primary/20 transition-colors"
+            >
+              <Plus className="w-4 h-4 text-primary" />
+            </motion.button>
+          </div>
         </div>
 
         {/* Events */}
@@ -412,6 +425,15 @@ export const CalendarView = ({
         onClose={() => { setShowEventDetail(false); setSelectedEvent(null); }}
         onSave={(updatedEvent) => { onUpdateEvent(updatedEvent); setShowEventDetail(false); setSelectedEvent(null); }}
         onDelete={(id) => { onDeleteEvent(id); setShowEventDetail(false); setSelectedEvent(null); }}
+        t={t}
+      />
+
+      {/* Add Event Dialog */}
+      <AddEventDialog
+        isOpen={showAddEvent}
+        onClose={() => setShowAddEvent(false)}
+        onAdd={onAddEvent}
+        selectedDate={selectedDate}
         t={t}
       />
     </motion.div>
