@@ -42,9 +42,9 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
         case 'top':
           return 'top-0 left-0 right-0 pt-[env(safe-area-inset-top)]';
         case 'left':
-          return 'left-0 top-0 bottom-0 pl-[env(safe-area-inset-left)] flex-col w-20';
+          return 'left-0 top-0 bottom-0 pl-[env(safe-area-inset-left)] flex-col w-[72px]';
         case 'right':
-          return 'right-0 top-0 bottom-0 pr-[env(safe-area-inset-right)] flex-col w-20';
+          return 'right-0 top-0 bottom-0 pr-[env(safe-area-inset-right)] flex-col w-[72px]';
         default: // bottom
           return 'bottom-0 left-0 right-0 pb-[env(safe-area-inset-bottom)]';
       }
@@ -81,8 +81,10 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
                   onClick={() => onTabChange(item.id)}
                   whileTap={{ scale: 0.94 }}
                   className={cn(
-                    'relative flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl transition-colors duration-150 min-w-[60px] min-h-[52px]',
-                    isVertical ? 'flex-col w-full' : 'flex-col',
+                    'relative flex items-center justify-center gap-1 rounded-2xl transition-colors duration-150',
+                    isVertical 
+                      ? 'flex-col w-full px-2 py-2.5 min-h-[56px]' 
+                      : 'flex-col px-3 py-2.5 min-w-[56px] min-h-[52px]',
                     activeTab === item.id
                       ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground'
@@ -92,21 +94,21 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
                     <motion.div
                       layoutId="nav-indicator"
                       className="absolute inset-0 bg-primary/10 rounded-2xl"
-                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
                     />
                   )}
                   <div className="relative z-10">
                     <item.icon
                       className={cn(
-                        'w-[22px] h-[22px] transition-transform duration-150',
-                        activeTab === item.id && 'scale-110'
+                        'w-5 h-5 transition-transform duration-150',
+                        activeTab === item.id && 'scale-105'
                       )}
                       strokeWidth={activeTab === item.id ? 2.2 : 1.6}
                     />
                   </div>
                   <span
                     className={cn(
-                      'text-[10px] font-medium relative z-10 leading-tight',
+                      'text-[9px] font-medium relative z-10 leading-tight text-center truncate max-w-full',
                       activeTab === item.id && 'font-semibold'
                     )}
                   >

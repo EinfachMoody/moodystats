@@ -380,9 +380,9 @@ const Index = () => {
       case 'top':
         return 'pt-24 pb-8';
       case 'left':
-        return 'pl-28 pr-6 pt-8 pb-8';
+        return 'pl-24 pr-4 pt-6 pb-6';
       case 'right':
-        return 'pr-28 pl-6 pt-8 pb-8';
+        return 'pr-24 pl-4 pt-6 pb-6';
       default: // bottom
         return 'pb-28 pt-6';
     }
@@ -391,7 +391,7 @@ const Index = () => {
   const getMainClasses = () => {
     const isVerticalNav = appSettings.navPosition === 'left' || appSettings.navPosition === 'right';
     if (isVerticalNav) {
-      return 'max-w-2xl mx-auto px-4';
+      return 'max-w-2xl mx-auto px-3';
     }
     return 'max-w-lg mx-auto px-4';
   };
@@ -483,34 +483,24 @@ const Index = () => {
 
       {/* Main Content */}
       <main className={getMainClasses()}>
-        <AnimatePresence mode="sync" initial={false}>
+        <AnimatePresence mode="wait" initial={false}>
           {activeTab === 'dashboard' && (
             <motion.div
               key="dashboard"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className="space-y-5"
             >
               {/* Header */}
               <div>
-                <motion.p 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.18, ease: 'easeOut' }}
-                  className="text-muted-foreground text-sm"
-                >
+                <p className="text-muted-foreground text-sm">
                   {format(new Date(), 'EEEE, MMMM d', { locale: dateLocale })}
-                </motion.p>
-                <motion.h1 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.08, duration: 0.2, ease: 'easeOut' }}
-                  className="text-2xl font-bold text-foreground mt-1"
-                >
+                </p>
+                <h1 className="text-2xl font-bold text-foreground mt-1">
                   {greetingMessage()} ✨
-                </motion.h1>
+                </h1>
               </div>
 
               {/* Stats Grid - Enhanced */}
@@ -681,7 +671,7 @@ const Index = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
               className="space-y-4"
             >
               <div className="flex items-center justify-between">
