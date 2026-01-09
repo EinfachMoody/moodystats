@@ -30,7 +30,9 @@ import { UndoToast } from '@/components/UndoToast';
 import { FocusTasks } from '@/components/FocusTasks';
 import { PageManager } from '@/components/PageManager';
 import { TaskDetailSheet } from '@/components/TaskDetailSheet';
-import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS, TaskPage, AppSettings, DEFAULT_SETTINGS } from '@/types';
+import { TaskSearch } from '@/components/TaskSearch';
+import { MoodDetailSheet } from '@/components/MoodDetailSheet';
+import { Task, MoodEntry, MoodType, JournalEntry, MOOD_EMOJIS, TaskPage, AppSettings, DEFAULT_SETTINGS, CalendarEvent } from '@/types';
 import { Language } from '@/i18n/translations';
 import { useTranslation } from '@/hooks/useTranslation';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -48,6 +50,7 @@ const Index = () => {
   const [totalPoints, setTotalPoints] = useLocalStorage<number>('dailyflow-points', 0);
   const [streak, setStreak] = useLocalStorage<number>('dailyflow-streak', 0);
   const [taskPages, setTaskPages] = useLocalStorage<TaskPage[]>('dailyflow-pages', []);
+  const [events, setEvents] = useLocalStorage<CalendarEvent[]>('dailyflow-events', []);
   const [appSettings, setAppSettings] = useLocalStorage<AppSettings>('dailyflow-settings', DEFAULT_SETTINGS);
   
   // Settings with localStorage
@@ -73,6 +76,8 @@ const Index = () => {
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [showPageManager, setShowPageManager] = useState(false);
   const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const [searchFilteredTasks, setSearchFilteredTasks] = useState<Task[] | null>(null);
+  const [showMoodDetail, setShowMoodDetail] = useState(false);
 
   const { t, isRTL } = useTranslation(language);
   const dateLocale = dateLocales[language] || enUS;
@@ -327,6 +332,23 @@ const Index = () => {
     }
   }, [setAppSettings]);
 
+  // Event handlers
+  const handleAddEvent = useCallback((event: Omit<CalendarEvent, 'id'>) => {
+    const newEvent: CalendarEvent = {
+      ...event,
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    };
+    setEvents(prev => [newEvent, ...prev]);
+  }, [setEvents]);
+
+  const handleUpdateEvent = useCallback((updatedEvent: CalendarEvent) => {
+    setEvents(prev => prev.map(e => e.id === updatedEvent.id ? updatedEvent : e));
+  }, [setEvents]);
+
+  const handleDeleteEvent = useCallback((eventId: string) => {
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+  }, [setEvents]);
+
   const filteredJournalEntries = searchTags
     ? journalEntries.filter(e => 
         e.tags.some(tag => tag.toLowerCase().includes(searchTags.toLowerCase())) ||
@@ -426,6 +448,16 @@ const Index = () => {
         onDelete={(id) => { handleDeleteTask(id); setShowTaskDetail(false); setSelectedTask(null); }}
         onDuplicate={handleDuplicateTask}
         t={t}
+      />
+
+      {/* Mood Detail Sheet */}
+      <MoodDetailSheet
+        moods={moods}
+        tasks={tasks}
+        isOpen={showMoodDetail}
+        onClose={() => setShowMoodDetail(false)}
+        t={t}
+        locale={dateLocale}
       />
 
       {/* Page Manager Sheet */}
@@ -672,6 +704,15 @@ const Index = () => {
                 </div>
               </div>
 
+              {/* Task Search */}
+              <TaskSearch
+                tasks={tasks}
+                onSearch={(filtered) => setSearchFilteredTasks(filtered)}
+                onClear={() => setSearchFilteredTasks(null)}
+                t={t}
+                isRTL={isRTL}
+              />
+
               {/* Pages Pills */}
               {taskPages.length > 0 && (
                 <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
@@ -798,13 +839,14 @@ const Index = () => {
             >
               <CalendarView
                 tasks={tasks}
-                events={[]}
+                events={events}
                 language={language}
                 t={t}
                 onAddTask={() => setIsAddTaskOpen(true)}
+                onAddEvent={handleAddEvent}
                 onSelectTask={(task) => { setSelectedTask(task); setShowTaskDetail(true); }}
-                onUpdateEvent={() => {}}
-                onDeleteEvent={() => {}}
+                onUpdateEvent={handleUpdateEvent}
+                onDeleteEvent={handleDeleteEvent}
               />
             </motion.div>
           )}
@@ -838,7 +880,18 @@ const Index = () => {
               transition={{ duration: 0.2, ease: 'easeOut' }}
               className="space-y-5"
             >
-              <h1 className="text-2xl font-bold text-foreground">{t('moodTracker')}</h1>
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-foreground">{t('moodTracker')}</h1>
+                {moods.length >= 3 && (
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowMoodDetail(true)}
+                    className="text-xs text-primary font-medium"
+                  >
+                    {t('moodInsights')}
+                  </motion.button>
+                )}
+              </div>
 
               <GlassCard className="!p-5">
                 <h3 className="font-semibold text-foreground mb-4 text-sm">{t('todaysMood')}</h3>

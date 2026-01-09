@@ -280,6 +280,26 @@ export const translations = {
     location: 'Location',
     addLocation: 'Add location...',
     editEvent: 'Edit Event',
+    addNewEvent: 'Add New Event',
+    whatIsHappening: 'What is happening?',
+    date: 'Date',
+    reminder: 'Reminder',
+    noReminder: 'No reminder',
+    hour: 'hour',
+    addEvent: 'Add Event',
+    
+    // Task Search
+    searchTasks: 'Search tasks...',
+    resultsFound: 'results found',
+    
+    // Mood Insights
+    moodInsights: 'Mood Insights',
+    last30Days: 'Last 30 Days',
+    daysTracked: 'Days Tracked',
+    averageMood: 'Average',
+    consistency: 'Consistency',
+    moodDistribution: 'Mood Distribution',
+    recentMoodsWithTasks: 'Recent Moods & Tasks',
     deleteEvent: 'Delete Event',
     
     // Quick Actions
@@ -527,6 +547,25 @@ export const translations = {
     addLocation: 'Ort hinzufügen...',
     editEvent: 'Event bearbeiten',
     deleteEvent: 'Event löschen',
+    addNewEvent: 'Neues Event',
+    whatIsHappening: 'Was steht an?',
+    date: 'Datum',
+    reminder: 'Erinnerung',
+    noReminder: 'Keine Erinnerung',
+    hour: 'Stunde',
+    addEvent: 'Event hinzufügen',
+    // Task Search
+    searchTasks: 'Aufgaben suchen...',
+    resultsFound: 'Ergebnisse gefunden',
+    
+    // Mood Insights
+    moodInsights: 'Stimmungs-Insights',
+    last30Days: 'Letzte 30 Tage',
+    daysTracked: 'Tage erfasst',
+    averageMood: 'Durchschnitt',
+    consistency: 'Konsistenz',
+    moodDistribution: 'Stimmungsverteilung',
+    recentMoodsWithTasks: 'Stimmungen & Aufgaben',
     
     // Quick Actions
     quickActions: 'Schnellaktionen',
