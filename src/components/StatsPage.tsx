@@ -214,17 +214,18 @@ export const StatsPage = ({
     other: completedTasks.filter(t => t.category === 'other').reduce((sum, t) => sum + t.points, 0),
   };
 
+  // Optimized animation variants - fast, no stagger for stability
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.06 }
+      transition: { duration: 0.15 }
     }
   };
 
   const itemVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 }
+    visible: { opacity: 1, transition: { duration: 0.12 } }
   };
 
   return (
@@ -284,23 +285,25 @@ export const StatsPage = ({
         </GlassCard>
 
         <GlassCard className="!p-3.5">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex-shrink-0">
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
-            <div className="flex items-center gap-1.5">
-              <p className="text-xl font-bold text-foreground">{productivityScore}%</p>
-              {weeklyTrend !== 0 && (
-                <span className={cn(
-                  "text-[10px] flex items-center",
-                  weeklyTrend > 0 ? "text-accent" : "text-destructive"
-                )}>
-                  {weeklyTrend > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-                  {Math.abs(weeklyTrend)}%
-                </span>
-              )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-xl font-bold text-foreground">{productivityScore}%</p>
+                {weeklyTrend !== 0 && (
+                  <span className={cn(
+                    "text-[10px] flex items-center flex-shrink-0",
+                    weeklyTrend > 0 ? "text-accent" : "text-destructive"
+                  )}>
+                    {weeklyTrend > 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                    {Math.abs(weeklyTrend)}%
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground truncate">{t('productivity')}</p>
             </div>
-            <p className="text-[10px] text-muted-foreground">{t('productivity')}</p>
           </div>
         </GlassCard>
       </motion.div>

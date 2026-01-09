@@ -58,33 +58,39 @@ export const AddEventDialog = ({ isOpen, onClose, onAdd, selectedDate, t }: AddE
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
             onClick={onClose}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
           />
 
-          {/* Dialog */}
+          {/* Dialog - centered with safe-area consideration */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed inset-x-4 top-1/2 -translate-y-1/2 z-50 max-w-lg mx-auto"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="fixed z-50 inset-4 flex items-center justify-center pointer-events-none"
+            style={{ 
+              paddingTop: 'max(env(safe-area-inset-top, 16px), 16px)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 16px), 16px)'
+            }}
           >
-            <div className="bg-background/95 backdrop-blur-xl rounded-3xl border border-border/50 shadow-2xl overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border/30">
-                <h2 className="text-lg font-semibold text-foreground">{t('addNewEvent')}</h2>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onClose}
-                  className="p-2 rounded-xl hover:bg-muted/50 transition-colors"
-                >
-                  <X className="w-5 h-5 text-muted-foreground" />
-                </motion.button>
-              </div>
+            <div className="w-full max-w-lg pointer-events-auto">
+              <div className="bg-background/95 backdrop-blur-xl rounded-3xl border border-border/50 shadow-2xl overflow-hidden max-h-[80vh] flex flex-col">
+                {/* Header */}
+                <div className="flex items-center justify-between p-4 border-b border-border/30 flex-shrink-0">
+                  <h2 className="text-lg font-semibold text-foreground">{t('addNewEvent')}</h2>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={onClose}
+                    className="p-2.5 rounded-xl hover:bg-muted/50 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  >
+                    <X className="w-5 h-5 text-muted-foreground" />
+                  </motion.button>
+                </div>
 
-              {/* Content */}
-              <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
+                {/* Content - scrollable */}
+                <div className="p-4 space-y-4 overflow-y-auto flex-1">
                 {/* Title */}
                 <div>
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">
@@ -219,23 +225,24 @@ export const AddEventDialog = ({ isOpen, onClose, onAdd, selectedDate, t }: AddE
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="p-4 border-t border-border/30 flex gap-3">
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={onClose}
-                  className="flex-1 py-3 rounded-xl bg-muted/50 text-foreground font-medium transition-colors hover:bg-muted"
-                >
-                  {t('cancel')}
-                </motion.button>
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSubmit}
-                  disabled={!title.trim()}
-                  className="flex-1 py-3 rounded-xl bg-primary text-primary-foreground font-medium transition-colors disabled:opacity-50"
-                >
-                  {t('addEvent')}
-                </motion.button>
+                {/* Footer */}
+                <div className="p-4 border-t border-border/30 flex gap-3 flex-shrink-0">
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={onClose}
+                    className="flex-1 py-3.5 rounded-xl bg-muted/50 text-foreground font-medium transition-colors hover:bg-muted min-h-[48px]"
+                  >
+                    {t('cancel')}
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={handleSubmit}
+                    disabled={!title.trim()}
+                    className="flex-1 py-3.5 rounded-xl bg-primary text-primary-foreground font-medium transition-colors disabled:opacity-50 min-h-[48px]"
+                  >
+                    {t('addEvent')}
+                  </motion.button>
+                </div>
               </div>
             </div>
           </motion.div>
