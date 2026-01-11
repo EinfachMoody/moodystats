@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { LucideIcon } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { cn } from '@/lib/utils';
+import { DURATION, EASING } from '@/lib/motion';
 
 interface StatsCardProps {
   title: string;
@@ -27,9 +28,9 @@ export const StatsCard = ({
   return (
     <GlassCard className="relative overflow-hidden">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay, duration: 0.4 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: delay * 0.5, duration: DURATION.normal, ease: EASING.smooth }}
       >
         {/* Background Gradient Blob */}
         <div 
@@ -61,14 +62,9 @@ export const StatsCard = ({
           </div>
 
           <div>
-            <motion.p 
-              className="text-3xl font-bold text-foreground"
-              initial={{ scale: 0.5 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: delay + 0.2, type: 'spring', stiffness: 200 }}
-            >
+            <p className="text-3xl font-bold text-foreground">
               {value}
-            </motion.p>
+            </p>
             <p className="text-sm text-muted-foreground mt-1">{title}</p>
             {subtitle && (
               <p className="text-xs text-muted-foreground/70 mt-0.5">{subtitle}</p>

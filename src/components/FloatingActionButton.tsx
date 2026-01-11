@@ -39,32 +39,27 @@ export const FloatingActionButton = ({ onClick, isRTL = false, customPosition }:
 
   return (
     <motion.button
-      initial={{ scale: 0.96, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.25, duration: 0.22, ease: 'easeOut' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.94 }}
       onClick={handleClick}
       className="fixed z-50 w-14 h-14 rounded-[1.25rem] flex items-center justify-center shadow-lg"
       style={getStyle()}
     >
-      <motion.div
-        whileHover={{ rotate: 90 }}
-        transition={{ duration: 0.25 }}
-      >
-        <Plus className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
-      </motion.div>
+      <Plus className="w-6 h-6 text-primary-foreground" strokeWidth={2.5} />
       
-      {/* Subtle pulse ring */}
+      {/* Subtle pulse ring - GPU accelerated with opacity only */}
       <motion.div
         className="absolute inset-0 rounded-[1.25rem]"
         animate={{
           boxShadow: [
-            '0 0 0 0px hsl(var(--primary) / 0.25)',
+            '0 0 0 0px hsl(var(--primary) / 0.2)',
             '0 0 0 6px hsl(var(--primary) / 0)',
           ],
         }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
       />
     </motion.button>
   );

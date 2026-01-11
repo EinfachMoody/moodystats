@@ -75,18 +75,18 @@ export const MoodSelector = ({ selectedMood, onSelect, t, completedTodayTasks = 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-center gap-3">
-        {moods.map((mood, index) => (
+        {moods.map((mood) => (
           <motion.button
             key={mood}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.4 }}
-            whileHover={{ scale: 1.15, y: -5 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+            whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleQuickSelect(mood)}
             onDoubleClick={() => handleMoodClick(mood)}
             className={cn(
-              'relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-all duration-300',
+              'relative flex flex-col items-center gap-2 p-3 rounded-2xl transition-colors duration-200',
               (selectedMood === mood || pendingMood === mood)
                 ? `bg-gradient-to-br ${moodGradients[mood]} shadow-lg`
                 : 'glass-card hover:shadow-glass-lg'

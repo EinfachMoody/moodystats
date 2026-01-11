@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
+import { DURATION, EASING } from '@/lib/motion';
 
 interface PointsAnimationProps {
   points: number;
@@ -11,21 +12,15 @@ export const PointsAnimation = ({ points, show, onComplete }: PointsAnimationPro
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ opacity: 0, y: 0, scale: 0.5 }}
-          animate={{ opacity: 1, y: -50, scale: 1 }}
-          exit={{ opacity: 0, y: -100, scale: 0.5 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ duration: DURATION.normal, ease: EASING.smooth }}
           onAnimationComplete={onComplete}
           className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 pointer-events-none"
         >
           <div className="glass-card px-6 py-4 flex items-center gap-2">
-            <motion.span
-              animate={{ rotate: [0, 360] }}
-              transition={{ duration: 0.5 }}
-              className="text-2xl"
-            >
-              ✨
-            </motion.span>
+            <span className="text-2xl">✨</span>
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               +{points} points!
             </span>
