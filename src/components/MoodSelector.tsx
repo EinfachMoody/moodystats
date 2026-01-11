@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MoodType, MOOD_EMOJIS, Task } from '@/types';
 import { cn } from '@/lib/utils';
 import { FileText, CheckCircle2, ChevronDown, ChevronUp } from 'lucide-react';
+import { triggerHaptic } from '@/hooks/useHapticFeedback';
 
 interface MoodSelectorProps {
   selectedMood: MoodType | null;
@@ -62,6 +63,7 @@ export const MoodSelector = ({ selectedMood, onSelect, t, completedTodayTasks = 
   };
 
   const handleQuickSelect = (mood: MoodType) => {
+    triggerHaptic('light');
     if (!showNoteInput) {
       const completedIds = completedTodayTasks.map(task => task.id);
       onSelect(mood, undefined, completedIds.length > 0 ? completedIds : undefined);

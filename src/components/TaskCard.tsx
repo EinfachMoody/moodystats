@@ -4,6 +4,7 @@ import { Task, CATEGORY_LABELS, TaskViewMode } from '@/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useState, useRef } from 'react';
+import { triggerHaptic } from '@/hooks/useHapticFeedback';
 
 interface TaskCardProps {
   task: Task;
@@ -51,6 +52,7 @@ export const TaskCard = ({
     isLongPress.current = false;
     longPressTimer.current = setTimeout(() => {
       isLongPress.current = true;
+      triggerHaptic('medium');
       setShowActions(true);
     }, 400);
   };
@@ -70,6 +72,7 @@ export const TaskCard = ({
 
   const handleAction = (e: React.MouseEvent, action: () => void) => {
     e.stopPropagation();
+    triggerHaptic('light');
     action();
     setShowActions(false);
   };
@@ -186,7 +189,7 @@ export const TaskCard = ({
         <motion.button
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.9 }}
-          onClick={(e) => { e.stopPropagation(); onComplete(task.id); }}
+          onClick={(e) => { e.stopPropagation(); triggerHaptic('success'); onComplete(task.id); }}
           className={cn(
             'flex-shrink-0 rounded-full border-2 flex items-center justify-center transition-all duration-200 mt-0.5',
             viewMode === 'compact' ? 'w-5 h-5' : 'w-[22px] h-[22px]',
