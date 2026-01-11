@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
+import { triggerHaptic } from '@/hooks/useHapticFeedback';
 
 interface FloatingActionButtonProps {
   onClick: () => void;
@@ -13,6 +14,10 @@ interface FloatingActionButtonProps {
 }
 
 export const FloatingActionButton = ({ onClick, isRTL = false, customPosition }: FloatingActionButtonProps) => {
+  const handleClick = () => {
+    triggerHaptic('medium');
+    onClick();
+  };
   const getStyle = (): React.CSSProperties => {
     if (customPosition) {
       return {
@@ -39,7 +44,7 @@ export const FloatingActionButton = ({ onClick, isRTL = false, customPosition }:
       transition={{ delay: 0.25, duration: 0.22, ease: 'easeOut' }}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.94 }}
-      onClick={onClick}
+      onClick={handleClick}
       className="fixed z-50 w-14 h-14 rounded-[1.25rem] flex items-center justify-center shadow-lg"
       style={getStyle()}
     >

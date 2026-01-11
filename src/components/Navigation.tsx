@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Home, CheckSquare, Calendar, BarChart3, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NavPosition } from '@/types';
+import { triggerHaptic } from '@/hooks/useHapticFeedback';
 
 interface NavigationProps {
   activeTab: string;
@@ -78,7 +79,10 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
               {navItems.map((item) => (
                 <motion.button
                   key={item.id}
-                  onClick={() => onTabChange(item.id)}
+                  onClick={() => {
+                    triggerHaptic('light');
+                    onTabChange(item.id);
+                  }}
                   whileTap={{ scale: 0.94 }}
                   className={cn(
                     'relative flex items-center justify-center gap-1 rounded-2xl transition-colors duration-150',
