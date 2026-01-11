@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { DURATION, EASING } from '@/lib/motion';
 
 interface GlassCardProps extends HTMLMotionProps<'div'> {
   children: React.ReactNode;
@@ -21,13 +22,13 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(({
       ref={ref}
       className={cn(
         'glass-card p-6',
-        hoverable && 'cursor-pointer transition-all duration-300 hover:shadow-glass-lg hover:-translate-y-1',
+        hoverable && 'cursor-pointer transition-all duration-200 hover:shadow-glass-lg hover:-translate-y-0.5',
         className
       )}
       style={glowColor ? { boxShadow: `0 8px 32px ${glowColor}20` } : undefined}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.22, ease: 'easeOut' }}
+      transition={{ duration: DURATION.fast, ease: EASING.smooth }}
       {...props}
     >
       {children}

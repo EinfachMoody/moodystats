@@ -110,6 +110,7 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd, t, language }: AddTaskDi
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
             onClick={onClose}
             className="fixed inset-0 bg-foreground/20 backdrop-blur-md z-50"
           />
@@ -118,7 +119,7 @@ export const AddTaskDialog = ({ isOpen, onClose, onAdd, t, language }: AddTaskDi
             initial={{ opacity: 0, y: '100%' }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+            transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
             className={cn(
               "fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto",
               isSaving && "animate-pulse"

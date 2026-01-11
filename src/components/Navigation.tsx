@@ -60,7 +60,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
         ref={ref}
         initial={getInitialAnimation()}
         animate={getFinalAnimation()}
-        transition={{ delay: 0.05, duration: 0.22, ease: 'easeOut' }}
+        transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
         className={cn('fixed z-50', getPositionClasses())}
         dir={isRTL ? 'rtl' : 'ltr'}
       >
@@ -94,11 +94,11 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
                       : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  {activeTab === item.id && (
+                {activeTab === item.id && (
                     <motion.div
                       layoutId="nav-indicator"
                       className="absolute inset-0 bg-primary/10 rounded-2xl"
-                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
                     />
                   )}
                   <div className="relative z-10">

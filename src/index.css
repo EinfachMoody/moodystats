@@ -171,7 +171,7 @@
     border: 0.5px solid hsl(var(--glass-border));
     border-radius: var(--radius);
     box-shadow: var(--glass-shadow), var(--glass-inner-shadow);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   }
 
   .glass-card::before {
@@ -201,7 +201,7 @@
 
   /* ===== UNIFIED BUTTON SYSTEM ===== */
   .glass-button {
-    @apply relative overflow-hidden font-semibold transition-all duration-300;
+    @apply relative overflow-hidden font-semibold;
     @apply px-5 py-3 rounded-2xl;
     @apply flex items-center justify-center gap-2;
     @apply active:scale-[0.97];
@@ -359,60 +359,62 @@
     @apply fixed inset-0 -z-10;
   }
 
-  /* ===== ANIMATIONS ===== */
+  /* ===== ANIMATIONS - GPU Accelerated (transform/opacity only) ===== */
+  
+  /* Background orb animation - uses transform only */
   @keyframes orbFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    25% { transform: translate(30px, -30px) scale(1.1); }
-    50% { transform: translate(-20px, 20px) scale(0.95); }
-    75% { transform: translate(20px, 10px) scale(1.05); }
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    25% { transform: translate3d(30px, -30px, 0) scale(1.1); }
+    50% { transform: translate3d(-20px, 20px, 0) scale(0.95); }
+    75% { transform: translate3d(20px, 10px, 0) scale(1.05); }
   }
 
   .glow-orb {
     @apply absolute rounded-full blur-3xl opacity-40;
     animation: orbFloat 20s ease-in-out infinite;
+    will-change: transform;
   }
 
+  /* Float animation - transform only */
   @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -6px, 0); }
   }
 
   .float-animation {
     animation: float 5s ease-in-out infinite;
+    will-change: transform;
   }
 
+  /* Bubble pop - transform and opacity */
   @keyframes bubblePop {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); }
+    50% { transform: scale(1.15); opacity: 0.8; }
     100% { transform: scale(0); opacity: 0; }
   }
 
   .bubble-pop {
-    animation: bubblePop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    animation: bubblePop 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Pulse glow - box-shadow animation (use sparingly) */
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.25); }
-    50% { box-shadow: 0 0 36px hsl(var(--primary) / 0.4); }
+    0%, 100% { box-shadow: 0 0 16px hsl(var(--primary) / 0.2); }
+    50% { box-shadow: 0 0 28px hsl(var(--primary) / 0.35); }
   }
 
   .pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
+    animation: pulseGlow 2.5s ease-in-out infinite;
   }
 
+  /* Page transition - opacity only for stability */
   @keyframes pageIn {
-    from {
-      opacity: 0;
-      transform: translateY(16px) scale(0.98);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   .page-transition {
-    animation: pageIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: pageIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   @keyframes shimmer {
