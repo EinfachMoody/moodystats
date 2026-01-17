@@ -27,11 +27,7 @@ export const StatsCard = ({
 }: StatsCardProps) => {
   return (
     <GlassCard className="relative overflow-hidden">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: delay * 0.5, duration: DURATION.normal, ease: EASING.smooth }}
-      >
+      <div>
         {/* Background Gradient Blob */}
         <div 
           className={cn(
@@ -71,7 +67,7 @@ export const StatsCard = ({
             )}
           </div>
         </div>
-      </motion.div>
+      </div>
     </GlassCard>
   );
 };

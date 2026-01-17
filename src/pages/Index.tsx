@@ -896,27 +896,25 @@ const Index = () => {
                     {t('moodOverview')}
                   </h3>
                   <div className="flex items-end justify-between gap-2 h-20">
-                    {moods.slice(0, 7).reverse().map((mood, index) => {
+                    {moods.slice(0, 7).reverse().map((mood) => {
                       const moodHeight: Record<string, number> = {
                         amazing: 100, good: 80, okay: 60, bad: 40, terrible: 20
                       };
                       return (
-                        <motion.div
+                        <div
                           key={mood.id}
-                          initial={{ height: 0 }}
-                          animate={{ height: `${moodHeight[mood.mood]}%` }}
-                          transition={{ delay: index * 0.05, duration: 0.3, ease: 'easeOut' }}
                           className={cn(
-                            "flex-1 rounded-lg flex items-end justify-center pb-1",
+                            "flex-1 rounded-lg flex items-end justify-center pb-1 transition-all duration-300",
                             mood.mood === 'amazing' && "bg-gradient-to-t from-emerald-500 to-emerald-300",
                             mood.mood === 'good' && "bg-gradient-to-t from-sky-500 to-sky-300",
                             mood.mood === 'okay' && "bg-gradient-to-t from-amber-500 to-amber-300",
                             mood.mood === 'bad' && "bg-gradient-to-t from-orange-500 to-orange-300",
                             mood.mood === 'terrible' && "bg-gradient-to-t from-rose-500 to-rose-300"
                           )}
+                          style={{ height: `${moodHeight[mood.mood]}%` }}
                         >
                           <span className="text-xs">{MOOD_EMOJIS[mood.mood]}</span>
-                        </motion.div>
+                        </div>
                       );
                     })}
                   </div>
@@ -1001,32 +999,25 @@ const Index = () => {
                 <h3 className="font-semibold text-foreground mb-3 text-sm">{t('yourEntries')}</h3>
                 {filteredJournalEntries.length > 0 ? (
                   <div className="space-y-2">
-                    {filteredJournalEntries.map((entry, index) => (
-                      <motion.div
-                        key={entry.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                      >
-                        <GlassCard className="!p-4">
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {format(new Date(entry.date), 'PPP', { locale: dateLocale })}
-                          </p>
-                          <p className="text-foreground text-sm leading-relaxed">{entry.text}</p>
-                          {entry.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1 mt-2">
-                              {entry.tags.map((tag, i) => (
-                                <span
-                                  key={i}
-                                  className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
-                                >
-                                  #{tag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </GlassCard>
-                      </motion.div>
+                    {filteredJournalEntries.map((entry) => (
+                      <GlassCard key={entry.id} className="!p-4">
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {format(new Date(entry.date), 'PPP', { locale: dateLocale })}
+                        </p>
+                        <p className="text-foreground text-sm leading-relaxed">{entry.text}</p>
+                        {entry.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {entry.tags.map((tag, i) => (
+                              <span
+                                key={i}
+                                className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </GlassCard>
                     ))}
                   </div>
                 ) : (
