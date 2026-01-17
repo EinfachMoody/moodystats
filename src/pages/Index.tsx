@@ -1083,6 +1083,7 @@ const Index = () => {
         t={t}
         isRTL={isRTL}
         position={appSettings.navPosition}
+        reducedMotion={appSettings.reducedMotion}
       />
     </div>
   );

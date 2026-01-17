@@ -26,7 +26,8 @@ import {
   LayoutList,
   LayoutGrid,
   CreditCard,
-  Droplets
+  Droplets,
+  Sparkles
 } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { LanguageSelector } from './LanguageSelector';
@@ -411,6 +412,26 @@ export const SettingsPage = ({
               style={{ backgroundColor: appSettings.accentColor }}
             />
           </SettingsRow>
+        </GlassCard>
+
+        {/* Accessibility */}
+        <GlassCard className="!p-0 overflow-hidden">
+          <div className="settings-group-header">
+            <span className="settings-group-title">{t('accessibility')}</span>
+          </div>
+          <div className="settings-row">
+            <div className="flex items-center gap-3">
+              <Sparkles className="w-5 h-5 text-primary" />
+              <div>
+                <span className="text-sm text-foreground">{t('reducedMotion')}</span>
+                <p className="text-xs text-muted-foreground">{t('reducedMotionDesc')}</p>
+              </div>
+            </div>
+            <Toggle 
+              enabled={appSettings.reducedMotion} 
+              onChange={() => onSettingsChange({ reducedMotion: !appSettings.reducedMotion })} 
+            />
+          </div>
         </GlassCard>
 
         {/* Navigation Position */}

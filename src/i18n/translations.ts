@@ -250,6 +250,13 @@ export const translations = {
     left: 'Left',
     right: 'Right',
     
+    // Accessibility
+    accessibility: 'Accessibility',
+    reducedMotion: 'Reduced Motion',
+    reducedMotionDesc: 'Reduce animations for accessibility',
+    animationsEnabled: 'Animations enabled',
+    animationsReduced: 'Animations reduced',
+    
     // Extended Stats
     averagePerDay: 'Average/Day',
     bestDay: 'Best Day',
@@ -516,6 +523,13 @@ export const translations = {
     top: 'Oben',
     left: 'Links',
     right: 'Rechts',
+    
+    // Accessibility
+    accessibility: 'Bedienungshilfen',
+    reducedMotion: 'Bewegung reduzieren',
+    reducedMotionDesc: 'Animationen für Barrierefreiheit reduzieren',
+    animationsEnabled: 'Animationen aktiviert',
+    animationsReduced: 'Animationen reduziert',
     
     averagePerDay: 'Durchschnitt/Tag',
     bestDay: 'Bester Tag',

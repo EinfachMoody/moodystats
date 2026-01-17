@@ -144,6 +144,9 @@ export const PAGE_COLORS = [
   '#6366F1', // Indigo
 ];
 
+// Animation intensity level
+export type AnimationIntensity = 'full' | 'reduced' | 'minimal';
+
 // App Settings Interface
 export interface AppSettings {
   // Layout & View
@@ -157,6 +160,8 @@ export interface AppSettings {
   themeMode: 'light' | 'dark' | 'system';
   // Navigation
   navPosition: NavPosition;
+  // Accessibility
+  reducedMotion: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -167,4 +172,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   glassIntensity: 'normal',
   themeMode: 'system',
   navPosition: 'bottom',
+  reducedMotion: false,
 };
