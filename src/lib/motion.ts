@@ -123,12 +123,75 @@ export const springConfig = {
 } as const;
 
 // === REDUCED MOTION SUPPORT ===
-export const getReducedMotionVariants = () => ({
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-});
 
-export const getReducedMotionTransition = () => ({
-  duration: DURATION.instant,
-});
+/**
+ * Check if user prefers reduced motion (static check).
+ * For reactive updates, use the useReducedMotion hook instead.
+ */
+export const prefersReducedMotion = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+};
+
+/**
+ * Get animation variants that respect reduced motion preference.
+ * Falls back to instant opacity-only transitions when reduced motion is preferred.
+ */
+export const getReducedMotionVariants = (reducedMotion?: boolean) => {
+  const shouldReduce = reducedMotion ?? prefersReducedMotion();
+  
+  if (shouldReduce) {
+    return {
+      initial: { opacity: 1 },
+      animate: { opacity: 1 },
+      exit: { opacity: 1 },
+    };
+  }
+  
+  return {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+};
+
+/**
+ * Get transition config that respects reduced motion preference.
+ */
+export const getReducedMotionTransition = (reducedMotion?: boolean) => {
+  const shouldReduce = reducedMotion ?? prefersReducedMotion();
+  
+  return {
+    duration: shouldReduce ? 0 : DURATION.fast,
+    ease: EASING.smooth,
+  };
+};
+
+/**
+ * Conditionally return animation props based on reduced motion preference.
+ * Pass `true` to skip animations entirely.
+ */
+export const motionSafe = <T extends object>(
+  props: T, 
+  reducedMotion?: boolean
+): T | Record<string, never> => {
+  const shouldReduce = reducedMotion ?? prefersReducedMotion();
+  return shouldReduce ? {} : props;
+};
+
+/**
+ * Get spring config that respects reduced motion.
+ * Returns instant transition when reduced motion is preferred.
+ */
+export const getSpringConfig = (
+  type: keyof typeof springConfig = 'soft',
+  reducedMotion?: boolean
+) => {
+  const shouldReduce = reducedMotion ?? prefersReducedMotion();
+  
+  if (shouldReduce) {
+    return { duration: 0 };
+  }
+  
+  return springConfig[type];
+};

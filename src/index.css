@@ -359,6 +359,33 @@
     @apply fixed inset-0 -z-10;
   }
 
+  /* ===== REDUCED MOTION SUPPORT ===== */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    
+    .glass-card,
+    .glass-button,
+    .glass-pill,
+    .ios-toggle,
+    .touch-feedback {
+      transition: none !important;
+    }
+    
+    .glow-orb,
+    .float-animation,
+    .pulse-glow,
+    .shimmer {
+      animation: none !important;
+    }
+  }
+  
   /* ===== ANIMATIONS - GPU Accelerated (transform/opacity only) ===== */
   
   /* Background orb animation - uses transform only */
