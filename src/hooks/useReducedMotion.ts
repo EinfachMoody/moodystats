@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 /**
  * Hook to detect user's reduced motion preference.
+ * Combines system preference with manual app setting.
  * Returns true if the user prefers reduced motion.
  */
-export const useReducedMotion = (): boolean => {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() => {
+export const useReducedMotion = (manualSetting?: boolean): boolean => {
+  const [systemPrefersReducedMotion, setSystemPrefersReducedMotion] = useState(() => {
     if (typeof window === 'undefined') return false;
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   });
@@ -14,7 +15,7 @@ export const useReducedMotion = (): boolean => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     
     const handleChange = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches);
+      setSystemPrefersReducedMotion(event.matches);
     };
 
     // Modern browsers
@@ -26,7 +27,8 @@ export const useReducedMotion = (): boolean => {
     return undefined;
   }, []);
 
-  return prefersReducedMotion;
+  // Manual setting overrides system preference
+  return manualSetting ?? systemPrefersReducedMotion;
 };
 
 /**
@@ -38,3 +40,11 @@ export const getMotionProps = (prefersReducedMotion: boolean) => ({
   animate: prefersReducedMotion ? false : undefined,
   transition: prefersReducedMotion ? { duration: 0 } : undefined,
 });
+
+/**
+ * Get animation transition based on reduced motion.
+ */
+export const getTransition = (prefersReducedMotion: boolean, normalDuration = 0.2) => 
+  prefersReducedMotion 
+    ? { duration: 0 } 
+    : { duration: normalDuration, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] };

@@ -1,9 +1,10 @@
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Home, CheckSquare, Calendar, BarChart3, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NavPosition } from '@/types';
 import { triggerHaptic } from '@/hooks/useHapticFeedback';
+import { useReducedMotion, getTransition } from '@/hooks/useReducedMotion';
 
 interface NavigationProps {
   activeTab: string;
@@ -11,6 +12,7 @@ interface NavigationProps {
   t?: (key: string) => string;
   isRTL?: boolean;
   position?: NavPosition;
+  reducedMotion?: boolean;
 }
 
 const defaultLabels: Record<string, string> = {
@@ -30,7 +32,11 @@ const navItems = [
 ];
 
 export const Navigation = forwardRef<HTMLElement, NavigationProps>(
-  ({ activeTab, onTabChange, t, isRTL = false, position = 'bottom' }, ref) => {
+  ({ activeTab, onTabChange, t, isRTL = false, position = 'bottom', reducedMotion: reducedMotionProp }, ref) => {
+    const systemReducedMotion = useReducedMotion(reducedMotionProp);
+    const shouldReduceMotion = reducedMotionProp ?? systemReducedMotion;
+    const transition = useMemo(() => getTransition(shouldReduceMotion, 0.15), [shouldReduceMotion]);
+    
     const getLabel = (id: string) => {
       if (t) return t(id);
       return defaultLabels[id] || id;
@@ -52,7 +58,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
     };
 
     // Keep a subtle mount animation, but avoid any layout-affecting movement.
-    const getInitialAnimation = () => ({ opacity: 0 });
+    const getInitialAnimation = () => shouldReduceMotion ? false : { opacity: 0 };
     const getFinalAnimation = () => ({ opacity: 1 });
 
     return (
@@ -60,7 +66,7 @@ export const Navigation = forwardRef<HTMLElement, NavigationProps>(
         ref={ref}
         initial={getInitialAnimation()}
         animate={getFinalAnimation()}
-        transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+        transition={transition}
         className={cn('fixed z-50', getPositionClasses())}
         dir={isRTL ? 'rtl' : 'ltr'}
       >

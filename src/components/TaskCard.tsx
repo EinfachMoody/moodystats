@@ -3,8 +3,9 @@ import { Check, Clock, Trash2, Star, CheckSquare, GripVertical, Edit3, Copy, Tar
 import { Task, CATEGORY_LABELS, TaskViewMode } from '@/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { triggerHaptic } from '@/hooks/useHapticFeedback';
+import { useReducedMotion, getTransition } from '@/hooks/useReducedMotion';
 
 interface TaskCardProps {
   task: Task;
@@ -17,6 +18,7 @@ interface TaskCardProps {
   viewMode?: TaskViewMode;
   isDraggable?: boolean;
   dragControls?: ReturnType<typeof useDragControls>;
+  reducedMotion?: boolean;
 }
 
 const priorityColors = {
@@ -42,8 +44,13 @@ export const TaskCard = ({
   index = 0, 
   viewMode = 'standard',
   isDraggable = false,
-  dragControls 
+  dragControls,
+  reducedMotion: reducedMotionProp
 }: TaskCardProps) => {
+  const systemReducedMotion = useReducedMotion(reducedMotionProp);
+  const shouldReduceMotion = reducedMotionProp ?? systemReducedMotion;
+  const transition = useMemo(() => getTransition(shouldReduceMotion, 0.2), [shouldReduceMotion]);
+  
   const [showActions, setShowActions] = useState(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const isLongPress = useRef(false);
@@ -82,16 +89,12 @@ export const TaskCard = ({
 
   return (
     <motion.div
-      layout="position"
-      layoutId={task.id}
-      initial={{ opacity: 0 }}
+      layout={shouldReduceMotion ? false : "position"}
+      layoutId={shouldReduceMotion ? undefined : task.id}
+      initial={shouldReduceMotion ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ 
-        duration: 0.2, 
-        ease: [0.4, 0, 0.2, 1],
-        layout: { duration: 0.15, ease: [0.4, 0, 0.2, 1] }
-      }}
+      exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+      transition={transition}
       onTouchStart={handleLongPressStart}
       onTouchEnd={handleLongPressEnd}
       onMouseDown={handleLongPressStart}
