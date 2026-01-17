@@ -36,23 +36,19 @@ export const MoodCard = ({ entry, index = 0, locale = enUS, t }: MoodCardProps) 
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay: index * 0.1, duration: 0.4 }}
-      whileHover={{ scale: 1.02, y: -2 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+      whileTap={{ scale: 0.98 }}
       className={cn(
-        'p-4 rounded-2xl transition-all duration-300 cursor-pointer',
+        'p-4 rounded-2xl transition-all duration-200 cursor-pointer',
         moodGradients[entry.mood]
       )}
     >
       <div className="flex items-center gap-3">
-        <motion.span 
-          className="text-3xl"
-          animate={{ rotate: [0, -10, 10, 0] }}
-          transition={{ duration: 0.5, delay: index * 0.1 + 0.3 }}
-        >
+        <span className="text-3xl">
           {MOOD_EMOJIS[entry.mood]}
-        </motion.span>
+        </span>
         
         <div className="flex-1">
           <p className="font-medium text-foreground/90">

@@ -87,15 +87,16 @@ export const SettingsPage = ({
   const currentLanguageInfo = LANGUAGES.find(l => l.code === language);
   const isRTL = false;
 
-  // Optimized animation variants - fast, no stagger to prevent jank
+  // Optimized animation - single fade, no staggering
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.15 } }
+    visible: { opacity: 1, transition: { duration: 0.18 } }
   };
 
+  // Items render immediately - no individual animation to prevent jank
   const itemVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.12 } }
+    hidden: {},
+    visible: {}
   };
 
   const BackButton = ({ title }: { title: string }) => (

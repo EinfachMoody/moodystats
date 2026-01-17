@@ -37,14 +37,14 @@ export const FocusTasks = ({
       <AnimatePresence mode="popLayout">
         {focusTasks.length > 0 ? (
           <div className="space-y-2">
-            {focusTasks.map((task, index) => (
+            {focusTasks.map((task) => (
               <motion.div
                 key={task.id}
                 layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95, x: -20 }}
-                transition={{ delay: index * 0.05 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
                 className={cn(
                   "glass-card p-4 border-l-4 border-l-primary",
                   task.completed && "opacity-60"

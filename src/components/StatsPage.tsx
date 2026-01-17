@@ -214,18 +214,19 @@ export const StatsPage = ({
     other: completedTasks.filter(t => t.category === 'other').reduce((sum, t) => sum + t.points, 0),
   };
 
-  // Optimized animation variants - fast, no stagger for stability
+  // Optimized animation - single container fade, no child animations
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { duration: 0.15 }
+      transition: { duration: 0.2 }
     }
   };
 
+  // Items render instantly - no animation delays to prevent frame drops
   const itemVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.12 } }
+    hidden: {},
+    visible: {}
   };
 
   return (
@@ -363,11 +364,9 @@ export const StatsPage = ({
           </div>
           <p className="text-2xl font-bold text-foreground">{focusTasksCompleted}<span className="text-sm font-normal text-muted-foreground">/{totalFocusTasks}</span></p>
           <div className="mt-2 h-1.5 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${focusQuote}%` }}
-              transition={{ delay: 0.4, duration: 0.5, ease: 'easeOut' }}
-              className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400"
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-yellow-500 to-amber-400 transition-all duration-500 ease-out"
+              style={{ width: `${focusQuote}%` }}
             />
           </div>
         </GlassCard>
@@ -412,12 +411,9 @@ export const StatsPage = ({
           <div className="flex items-center justify-between gap-2">
             {streakHistory.map((day, index) => (
               <div key={index} className="flex flex-col items-center gap-1.5 flex-1">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2 + index * 0.05, duration: 0.2, ease: 'easeOut' }}
+                <div
                   className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium",
+                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-transform duration-200",
                     day.hasActivity 
                       ? "bg-gradient-to-br from-secondary to-orange-500 text-white" 
                       : "bg-muted text-muted-foreground",
@@ -425,7 +421,7 @@ export const StatsPage = ({
                   )}
                 >
                   {day.hasActivity ? '🔥' : day.completed}
-                </motion.div>
+                </div>
                 <span className={cn(
                   "text-[9px]",
                   day.isToday ? "text-primary font-medium" : "text-muted-foreground"
@@ -451,11 +447,9 @@ export const StatsPage = ({
           <div className="flex gap-2 mb-2">
             <div className="flex-1">
               <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${onTimeRate}%` }}
-                  transition={{ delay: 0.4, duration: 0.6, ease: 'easeOut' }}
-                  className="h-full rounded-full bg-gradient-to-r from-accent to-emerald-400"
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-accent to-emerald-400 transition-all duration-500 ease-out"
+                  style={{ width: `${onTimeRate}%` }}
                 />
               </div>
             </div>
@@ -481,21 +475,15 @@ export const StatsPage = ({
           </div>
           
           <div className="flex items-end justify-between gap-2 h-28">
-            {weeklyData.map((day, index) => (
-              <motion.div
+            {weeklyData.map((day) => (
+              <div
                 key={day.day}
-                initial={{ height: 0 }}
-                animate={{ height: '100%' }}
-                transition={{ delay: index * 0.08, duration: 0.4 }}
-                className="flex-1 flex flex-col items-center gap-1.5"
+                className="flex-1 flex flex-col items-center gap-1.5 h-full"
               >
                 <div className="flex-1 w-full flex items-end justify-center">
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: `${Math.max((day.completed / maxCompleted) * 100, 4)}%` }}
-                    transition={{ delay: 0.3 + index * 0.08, duration: 0.5, ease: 'easeOut' }}
+                  <div
                     className={cn(
-                      "w-full max-w-[24px] rounded-lg",
+                      "w-full max-w-[24px] rounded-lg transition-all duration-300 ease-out",
                       day.isToday 
                         ? "bg-gradient-to-t from-primary to-primary/60" 
                         : day.completed > 0 
@@ -503,6 +491,7 @@ export const StatsPage = ({
                         : "bg-muted-foreground/15"
                     )}
                     style={{ 
+                      height: `${Math.max((day.completed / maxCompleted) * 100, 4)}%`,
                       boxShadow: day.isToday && day.completed > 0 
                         ? '0 4px 12px hsl(var(--primary) / 0.3)' 
                         : 'none' 
@@ -515,7 +504,7 @@ export const StatsPage = ({
                 )}>
                   {day.day}
                 </span>
-              </motion.div>
+              </div>
             ))}
           </div>
         </GlassCard>
@@ -533,11 +522,9 @@ export const StatsPage = ({
           </div>
           
           <div className="h-3 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${Math.min((monthlyCompleted / Math.max(tasks.length, 1)) * 100, 100)}%` }}
-              transition={{ delay: 0.5, duration: 0.8, ease: 'easeOut' }}
-              className="h-full rounded-full bg-gradient-to-r from-primary via-accent to-primary"
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500 ease-out"
+              style={{ width: `${Math.min((monthlyCompleted / Math.max(tasks.length, 1)) * 100, 100)}%` }}
             />
           </div>
           <p className="text-[10px] text-muted-foreground mt-2 text-center">
@@ -565,18 +552,16 @@ export const StatsPage = ({
                     <span className="text-lg w-7">{MOOD_EMOJIS[mood]}</span>
                     <div className="flex-1">
                       <div className="h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(count / totalMoods) * 100}%` }}
-                          transition={{ delay: 0.5, duration: 0.5 }}
+                        <div
                           className={cn(
-                            "h-full rounded-full",
+                            "h-full rounded-full transition-all duration-500 ease-out",
                             mood === 'amazing' && "bg-gradient-to-r from-accent to-emerald-400",
                             mood === 'good' && "bg-gradient-to-r from-primary to-blue-400",
                             mood === 'okay' && "bg-gradient-to-r from-yellow-500 to-amber-400",
                             mood === 'bad' && "bg-gradient-to-r from-secondary to-orange-400",
                             mood === 'terrible' && "bg-gradient-to-r from-destructive to-rose-400"
                           )}
+                          style={{ width: `${(count / totalMoods) * 100}%` }}
                         />
                       </div>
                     </div>
@@ -616,17 +601,15 @@ export const StatsPage = ({
                     <p className="text-sm font-bold text-foreground">{count}</p>
                   </div>
                   <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(count / totalCategoryTasks) * 100}%` }}
-                      transition={{ delay: 0.6, duration: 0.4 }}
+                    <div
                       className={cn(
-                        "h-full rounded-full",
+                        "h-full rounded-full transition-all duration-500 ease-out",
                         category === 'work' && "bg-purple-500",
                         category === 'personal' && "bg-primary",
                         category === 'health' && "bg-accent",
                         category === 'other' && "bg-muted-foreground"
                       )}
+                      style={{ width: `${(count / totalCategoryTasks) * 100}%` }}
                     />
                   </div>
                 </div>
